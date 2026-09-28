@@ -221,9 +221,26 @@ migrar o restante do pipeline e montar a DAG do Airflow.
 
 | Fonte | Métrica que destrava | Situação |
 |---|---|---|
-| Pesquisa Origem-Destino (Metrô SP) | População flutuante por zona OD | A integrar |
-| Metrô SP / CPTM – demanda por estação | Fluxo de pessoas perto do ponto | A integrar |
-| GeoSampa – estações e zoneamento | Localização das estações e se a zona permite a atividade | A integrar |
+| Pesquisa Origem-Destino 2023 (Metrô SP) | População flutuante: viagens atraídas por motivo e pessoas que trabalham no distrito ou raio | **Integrada em 28/09/2026** (microdados com coordenadas, sem precisar das zonas OD) |
+| Metrô SP – demanda por estação (linhas 1, 2, 3 e 15) | Fluxo de pessoas perto do ponto | **Integrada em 28/09/2026** (CSV do portal da transparência) |
+| Motiva – demanda por estação (linhas 4, 5, 8 e 9) | Fluxo de pessoas perto do ponto | **Integrada em 28/09/2026** (PDFs mensais, lidos com `pypdf`) |
+| CPTM – demanda por estação (linhas 7, 10, 11, 12 e 13) e Linha 6-Laranja | Fluxo de pessoas perto do ponto | Pendente: não foi encontrada publicação aberta por estação |
+| GeoSampa – estações | Localização das estações de metrô e trem | **Integrada em 28/09/2026** (WFS) |
+| GeoSampa – zoneamento | Se a zona permite a atividade | A integrar |
 | Prefeitura de SP – alvarás / licenciamento | Confirmar se a cafeteria está operando | A integrar |
 | IPTU – cadastro de imóveis | Custo de ocupação (complementa o ITBI) | A integrar |
 | Novo CAGED | Salário de admissão de atendente/barista | A integrar |
+
+Tabelas geradas pelas fontes integradas:
+
+| Camada | Tabela | Conteúdo |
+|---|---|---|
+| staging | `pesquisa_od/viagens.parquet`, `pesquisa_od/pessoas.parquet` | Viagens com destino, motivo e fator de expansão; pessoas com local de trabalho (EPSG:4326) |
+| staging | `metro/demanda_estacoes.parquet`, `motiva/demanda_estacoes.parquet` | Demanda média em dias úteis por linha, estação e competência |
+| staging | `geosampa/estacoes_metro_trem.parquet` | Estações em operação com coordenadas e `chave_estacao` normalizada |
+| marts | `estacoes_demanda.parquet` | Estação + demanda média dos últimos 12 meses + distrito |
+| marts | `viagens_destino.parquet` | Destinos das viagens com categoria de motivo e distrito |
+| marts | `distritos_mobilidade.parquet` | Viagens atraídas, trabalhadores, estações e demanda por distrito |
+
+Próximo passo sugerido para essas fontes: substituir a proxy de 50% do consumo no local de
+trabalho (empregos RAIS) pelas viagens atraídas da Pesquisa OD no cálculo do mercado potencial.

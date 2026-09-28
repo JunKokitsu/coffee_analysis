@@ -15,6 +15,7 @@ Todos os valores foram gerados pelo pipeline em `main.py` a partir das fontes p�
    - **Av. Campanella, 1000:** nenhuma cafeteria e 41 lanchonetes/padarias. É uma demanda de bairro, sensível a preço.
 6. **A margem do insumo está favorável.** Em 12 meses o arábica caiu 29% e o café moído caiu 19% no IPCA, enquanto o cafezinho subiu 7%.
 7. **No ranking, nenhum dos dois distritos está no topo.** Pinheiros ficou em 34º e Itaquera em 74º. Os primeiros colocados combinam mercado por ponto de venda acima da média, boa sobrevivência e m² moderado: Jaguaré, Morumbi, Campo Grande, Barra Funda e Butantã.
+8. **A Pesquisa OD confirma Pinheiros como polo de destino** (incluído em 28/09/2026). O distrito atrai 239 mil viagens por dia útil, ou 3,7 por morador, sendo 167 mil a trabalho. Suas estações somam 324 mil passageiros por dia. Itaquera atrai 173 mil viagens, 0,8 por morador, igual à mediana, com mais peso de compras e serviços (26 mil contra 20 mil em Pinheiros). No raio de 500 m, a Rua dos Pinheiros recebe 27,6 mil viagens por dia, contra 4,4 mil na Av. Campanella.
 
 ## 1. Ficha comparativa dos distritos
 
@@ -32,6 +33,21 @@ Todos os valores foram gerados pelo pipeline em `main.py` a partir das fontes p�
 | Gasto com café + lanches fora de casa por domicílio (R$/mês) | R$ 21,71 | R$ 74,14 | R$ 27,67 | POF 2017-18 + IPCA |
 | Mercado potencial de café fora de casa (R$/mês) | R$ 300.092 | R$ 623.684 | R$ 270.266 | Derivada |
 | Mercado potencial café + lanches (R$/mês) | R$ 1.001.061 | R$ 2.028.608 | R$ 878.323 | Derivada |
+
+### Fluxo de pessoas
+
+| Métrica | Itaquera | Pinheiros | Mediana dos 96 distritos | Fonte |
+| --- | --- | --- | --- | --- |
+| Viagens diárias atraídas (trabalho, estudo, compras, serviços e lazer) | 172.898 | 239.189 | 100.987 | Pesquisa OD 2023 |
+| Viagens diárias atraídas por trabalho | 74.362 | 167.278 | 43.907 | Pesquisa OD 2023 |
+| Viagens diárias atraídas por compras e serviços | 25.831 | 19.889 | 12.064 | Pesquisa OD 2023 |
+| Viagens diárias atraídas por lazer e refeição | 14.897 | 26.415 | 4.684 | Pesquisa OD 2023 |
+| Viagens atraídas por morador | 0,8 | 3,7 | 0,8 | Derivada |
+| Viagens entrevistadas na amostra | 492 | 1.431 | 314 | Pesquisa OD 2023 |
+| Pessoas que trabalham no distrito (formais e informais) | 78.390 | 182.968 | 53.921 | Pesquisa OD 2023 |
+| Estações de metrô e trem (contadas por linha) | 3 | 8 | 1 | GeoSampa |
+| Estações sem dado de demanda (CPTM) | 2 | 0 | 0 | GeoSampa |
+| Demanda média das estações em dias úteis | 67.833 | 324.038 | 0 | Metrô e Motiva, 12 meses |
 
 ### Concorrência
 
@@ -116,10 +132,10 @@ Coortes de CNPJs abertos desde 2012. Um negócio conta como fechado quando está
 
 | Indicador | Variação em 12 meses | Variação desde jan/2018 |
 | --- | --- | --- |
-| IPCA RMSP - Cafezinho (até 202608) | +7,0% | +125,9% |
 | IPCA RMSP - Índice geral (até 202608) | +4,5% | +57,4% |
 | IPCA RMSP - Café moído (até 202608) | -18,7% | +138,4% |
 | IPCA RMSP - Lanche (até 202608) | +7,0% | +101,8% |
+| IPCA RMSP - Cafezinho (até 202608) | +7,0% | +125,9% |
 | Café arábica CEPEA/ESALQ (saca de 60 kg) | -29,1% | n/d |
 
 | Data | Arábica CEPEA/ESALQ (R$/saca de 60 kg) |
@@ -142,7 +158,7 @@ Quando o grão cai e o cafezinho sobe, o custo do insumo principal alivia enquan
 
 ## 5. Área de influência dos endereços-exemplo
 
-Cálculo por raio em torno do endereço. A população vem da área de cada setor censitário que cai dentro do círculo. Cafeterias e empregos são contados pelo endereço ou, na falta dele, pelo centro do CEP.
+Cálculo por raio em torno do endereço. A população vem da área de cada setor censitário que cai dentro do círculo. Cafeterias e empregos são contados pelo endereço ou, na falta dele, pelo centro do CEP. Viagens atraídas vêm dos destinos entrevistados na Pesquisa OD 2023, e estações são as que ficam dentro do raio.
 
 ### Avenida Campanella, 1000 (Itaquera)
 
@@ -151,6 +167,11 @@ Cálculo por raio em torno do endereço. A população vem da área de cada seto
 | População residente | 4.388 | 12.217 | 37.480 | Censo 2022 |
 | Empregos formais | 267 | 674 | 3.247 | RAIS 2025 |
 | Mercado potencial café + lanches (R$/mês) | R$ 19.115 | R$ 53.196 | R$ 167.001 | Derivada |
+| Viagens diárias atraídas (exceto volta para casa) | 2.243 | 4.369 | 59.443 | Pesquisa OD 2023 |
+| Viagens diárias atraídas por trabalho | 1.037 | 1.050 | 26.628 | Pesquisa OD 2023 |
+| Viagens entrevistadas na amostra | 10 | 17 | 159 | Pesquisa OD 2023 |
+| Estações de metrô e trem (por linha) | 0 | 0 | 2 | GeoSampa |
+| Demanda média das estações em dias úteis | 0 | 0 | 67.833 | Metrô e Motiva, 12 meses |
 | Cafeterias ativas | 0 | 0 | 2 | CNPJ |
 | Lanchonetes ativas | 9 | 28 | 106 | CNPJ |
 | Padarias ativas | 3 | 13 | 25 | CNPJ |
@@ -165,6 +186,11 @@ Cálculo por raio em torno do endereço. A população vem da área de cada seto
 | População residente | 3.875 | 10.285 | 30.641 | Censo 2022 |
 | Empregos formais | 4.893 | 27.812 | 81.455 | RAIS 2025 |
 | Mercado potencial café + lanches (R$/mês) | R$ 100.702 | R$ 356.164 | R$ 1.064.226 | Derivada |
+| Viagens diárias atraídas (exceto volta para casa) | 10.419 | 27.552 | 106.551 | Pesquisa OD 2023 |
+| Viagens diárias atraídas por trabalho | 8.630 | 17.733 | 77.857 | Pesquisa OD 2023 |
+| Viagens entrevistadas na amostra | 70 | 188 | 626 | Pesquisa OD 2023 |
+| Estações de metrô e trem (por linha) | 1 | 1 | 2 | GeoSampa |
+| Demanda média das estações em dias úteis | 19.619 | 19.619 | 54.753 | Metrô e Motiva, 12 meses |
 | Cafeterias ativas | 8 | 17 | 67 | CNPJ |
 | Lanchonetes ativas | 19 | 73 | 271 | CNPJ |
 | Padarias ativas | 3 | 14 | 40 | CNPJ |
@@ -202,6 +228,10 @@ Cálculo por raio em torno do endereço. A população vem da área de cada seto
 | RAIS 2025 (MTE/PDET) | Empregos formais por distrito (pelo CEP do estabelecimento); porte das lanchonetes; salários | CNAE 5611-2/03 |
 | Prefeitura de SP – guias de ITBI 2026 | Preço mediano do m² de imóveis comerciais | Compra e venda de lojas ou imóveis de padrão comercial horizontal |
 | CEPEA/ESALQ (via Notícias Agrícolas) | Preço do café arábica | Indicador diário, um ponto por mês |
+| Metrô SP – Pesquisa Origem-Destino 2023 | Viagens atraídas por motivo (trabalho, estudo, compras, serviços, lazer, refeição) e pessoas que trabalham em cada distrito ou raio | Microdados com coordenadas do destino, expandidos pelo fator de viagem; dia útil típico |
+| Metrô SP – portal da transparência | Demanda média das estações em dias úteis (entradas + transferências) | Linhas 1, 2, 3 e 15; média dos últimos 12 meses |
+| Motiva (ViaQuatro e ViaMobilidade) | Demanda média das estações em dias úteis | Linhas 4, 5, 8 e 9; média dos últimos 12 meses |
+| Prefeitura de SP – GeoSampa | Localização das estações de metrô e trem em operação | Camadas `estacao_metro` e `estacao_trem` |
 
 **Classificação das cafeterias:** estabelecimentos com CNAE de alimentação cujo nome fantasia ou razão social contém CAFÉ, CAFETERIA, COFFEE, ESPRESSO, EXPRESSO, BARISTA ou TORRA. As demais lanchonetes (5611-2/03) e padarias contam como concorrência indireta. Padarias da CNAE 1091-1/02 só entram quando o nome indica padaria ou panificadora, para excluir confeitarias caseiras.
 
@@ -222,12 +252,15 @@ Distritos com menos de 30 negócios na amostra de sobrevivência ou com menos de
 - **CNPJ ativo não significa operando**: há atraso nas baixas, então a concorrência e a sobrevivência ficam superestimadas.
 - **Classificação por nome**: cafeterias sem "café" no nome entram como lanchonetes, e lanchonetes com "café" no nome entram como cafeterias.
 - **ITBI com poucas transações** em distritos periféricos. A amostra aparece na ficha e medianas com menos de 10 transações devem ser lidas com cautela.
-- **Parâmetro de 50% do consumo no trabalho**: é uma suposição, não uma medição. A Pesquisa Origem-Destino pode substituí-la.
+- **Parâmetro de 50% do consumo no trabalho**: é uma suposição, não uma medição. A Pesquisa Origem-Destino já está integrada, mas ainda não substitui esse parâmetro no mercado potencial.
+- **Pesquisa OD é amostral**: nos raios de 300 m a amostra tem poucas dezenas de viagens entrevistadas. A linha "Viagens entrevistadas na amostra" mostra quantas, e valores com menos de 30 entrevistas devem ser lidos só como ordem de grandeza.
+- **Demanda das estações incompleta**: a CPTM (linhas 7, 10, 11, 12 e 13) e a Linha 6-Laranja ainda não têm fonte integrada. Distritos atendidos por essas linhas, como Itaquera, ficam com a demanda subestimada. A linha "Estações sem dado de demanda" mostra quantas faltam.
+- **Transferências contadas nas estações de integração**: a demanda publicada soma entradas e transferências, então quem troca de linha é contado de novo. Isso ainda é fluxo de pessoas passando pelo local, mas infla um pouco os polos de integração.
 
 ## 9. Próximos passos sugeridos
 
 1. Validar a classificação de cafeterias com uma amostra manual (ex.: 50 CNPJs por distrito comparados com o Google Maps).
-2. Trocar a proxy de empregos por fluxo real: Pesquisa Origem-Destino e demanda por estação do Metrô/CPTM.
+2. Usar as viagens atraídas da Pesquisa Origem-Destino no lugar da proxy de empregos formais no mercado potencial, e incluir a demanda por estação da CPTM.
 3. Incluir o valor venal do IPTU (cobertura total dos lotes) para complementar o ITBI nos distritos com poucas vendas.
 4. Calibrar os pesos do índice contra a sobrevivência observada das cafeterias abertas entre 2019 e 2022.
 5. Abrir a análise por endereço para qualquer ponto informado pelo cliente (o código já aceita novos endereços em `main.py`).

@@ -14,12 +14,16 @@ class InfluenceAreaLayers:
         sectors: geopandas.GeoDataFrame,
         establishments: geopandas.GeoDataFrame,
         jobs: geopandas.GeoDataFrame,
+        trips: geopandas.GeoDataFrame,
+        stations: geopandas.GeoDataFrame,
         city_spending_per_person: float,
         reference_date: date,
     ) -> None:
         self._sectors = sectors
         self._establishments = establishments
         self._jobs = jobs
+        self._trips = trips[trips["categoria_motivo"] != "residencia"]
+        self._stations = stations
         self._city_spending_per_person = city_spending_per_person
         self._recent_opening_limit = pandas.Timestamp(reference_date - timedelta(days=RECENT_OPENING_DAYS))
 
@@ -35,7 +39,7 @@ class InfluenceAreaLayers:
             "mercado_mensal_por_ponto_de_venda": self._ratio(market, sale_points),
         }
         identification: dict[str, float | int | str] = {"endereco_candidato": candidate, "raio_metros": radius}
-        return {**identification, **demand, **competition, **ratios}
+        return {**identification, **demand, **self._mobility(circle), **competition, **ratios}
 
     def _ratio(self, numerator: float, denominator: int) -> float:
         if denominator == 0:
@@ -59,6 +63,18 @@ class InfluenceAreaLayers:
             "vinculos_formais": formal_jobs,
             "gasto_mensal_residentes": resident_spending,
             "mercado_potencial_mensal": market,
+        }
+
+    def _mobility(self, circle: BaseGeometry) -> dict[str, float]:
+        nearby_trips = self._trips[self._trips.within(circle)]
+        work_trips = nearby_trips[nearby_trips["categoria_motivo"] == "trabalho"]
+        nearby_stations = self._stations[self._stations.within(circle)]
+        return {
+            "viagens_atraidas_nao_residenciais": float(nearby_trips["fator_expansao_viagem"].sum()),
+            "viagens_atraidas_trabalho": float(work_trips["fator_expansao_viagem"].sum()),
+            "viagens_atraidas_amostra": float(len(nearby_trips)),
+            "estacoes_metro_trem": float(len(nearby_stations)),
+            "demanda_estacoes_dias_uteis": float(nearby_stations["demanda_media_dias_uteis"].sum()),
         }
 
     def _competition(self, circle: BaseGeometry) -> dict[str, int]:

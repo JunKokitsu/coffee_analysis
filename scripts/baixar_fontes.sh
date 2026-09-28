@@ -4,6 +4,7 @@ set -euo pipefail
 RAIZ="$(cd "$(dirname "$0")/.." && pwd)"
 BRUTO="$RAIZ/data/raw"
 MES_CNPJ="${MES_CNPJ:-2026-09}"
+COMPETENCIA="${COMPETENCIA:-$(date +%Y-%m)}"
 TOKEN_RECEITA="gn672Ad4CF8N6TK"
 ENDERECO_RECEITA="https://arquivos.receitafederal.gov.br/public.php/webdav/Dados/Cadastros/CNPJ/$MES_CNPJ"
 TAMANHO_PARTE=67108864
@@ -70,3 +71,46 @@ baixar "$BRUTO/rais/RAIS_VINC_PUB_SP.7z" "$PDET_RAIS/RAIS_VINC_PUB_SP.7z"
 (cd "$BRUTO/rais" && 7z e -y RAIS_ESTAB_PUB.7z > /dev/null && 7z e -y RAIS_VINC_PUB_SP.7z > /dev/null)
 
 baixar "$BRUTO/itbi/guias_itbi_2026.xlsx" "https://prefeitura.sp.gov.br/documents/d/fazenda/guias-de-itbi-pagas-27082026-xls-xlsx"
+
+PESQUISA_OD="$BRUTO/pesquisa_od/2023"
+baixar "$PESQUISA_OD/Site_190225_PesquisaOD2023.zip" "https://transparencia.metrosp.com.br/sites/default/files/Site_190225_PesquisaOD2023.zip"
+unzip -o -q "$PESQUISA_OD/Site_190225_PesquisaOD2023.zip" -d "$PESQUISA_OD/"
+
+METRO_TRANSPARENCIA="https://transparencia.metrosp.com.br"
+
+endereco_demanda_metro() {
+    local ano="$1"
+    curl -s -A "Mozilla/5.0" "$METRO_TRANSPARENCIA/dataset/demanda" \
+        | grep -oE "/dataset/demanda/resource/[a-f0-9-]+\"[^>]*title=\"Demanda de Passageiros por Estação - Média Dias Úteis - $ano\"" \
+        | grep -oE '/dataset/demanda/resource/[a-f0-9-]+' \
+        | while read -r recurso; do
+            curl -s -A "Mozilla/5.0" "$METRO_TRANSPARENCIA$recurso" | grep -oE "$METRO_TRANSPARENCIA/sites/default/files/[^\"]+\.csv" || true
+        done \
+        | head -1
+}
+
+ANO_COMPETENCIA="${COMPETENCIA%-*}"
+for ano in $((ANO_COMPETENCIA - 1)) "$ANO_COMPETENCIA"; do
+    baixar "$BRUTO/metro/$COMPETENCIA/demanda_estacoes_$ano.csv" "$(endereco_demanda_metro "$ano")"
+done
+
+MOTIVA="https://trilhos.motiva.com.br"
+
+baixar_demanda_motiva() {
+    local pagina="$1" pasta="$2"
+    curl -s -L -A "Mozilla/5.0" "$MOTIVA/$pagina/historico-de-pessoas-transportadas/" \
+        | grep -oE '/content/dam/[^"]*/entrada-de-passageiros-por-estacao/[^"]*\.pdf' \
+        | sort -u \
+        | while read -r caminho; do
+            baixar "$BRUTO/motiva/$COMPETENCIA/$pasta/$(basename "$caminho")" "$MOTIVA$caminho"
+        done
+}
+
+baixar_demanda_motiva "linha-4-amarela" "linha-4"
+baixar_demanda_motiva "linha-5-lilas" "linha-5"
+baixar_demanda_motiva "viamobilidade8e9" "linha-8-e-9"
+
+GEOSAMPA_WFS="https://wfs.geosampa.prefeitura.sp.gov.br/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&outputFormat=application/json&srsName=EPSG:4326"
+for camada in estacao_metro estacao_trem; do
+    baixar "$BRUTO/geosampa/$COMPETENCIA/$camada.json" "$GEOSAMPA_WFS&typeNames=geoportal:$camada"
+done

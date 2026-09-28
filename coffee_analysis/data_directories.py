@@ -13,8 +13,23 @@ class DataDirectories:
         directory = self.root.joinpath("data", "raw", folder)
         return sorted(directory.glob(pattern))
 
+    def latest_raw_competence(self, source: str) -> Path:
+        directory = self.root.joinpath("data", "raw", source)
+        competences = sorted(path for path in directory.iterdir() if path.is_dir())
+        return competences[-1]
+
     def processed_file(self, name: str) -> Path:
         directory = self.root.joinpath("data", "processed")
+        directory.mkdir(parents=True, exist_ok=True)
+        return directory / name
+
+    def staging_file(self, source: str, name: str) -> Path:
+        directory = self.root.joinpath("data", "staging", source)
+        directory.mkdir(parents=True, exist_ok=True)
+        return directory / name
+
+    def marts_file(self, name: str) -> Path:
+        directory = self.root.joinpath("data", "marts")
         directory.mkdir(parents=True, exist_ok=True)
         return directory / name
 

@@ -13,11 +13,17 @@ from coffee_analysis.consumer_price_index import ConsumerPriceIndex
 from coffee_analysis.data_directories import DataDirectories
 from coffee_analysis.district_income import DistrictIncome
 from coffee_analysis.district_metrics import DistrictMetrics
+from coffee_analysis.district_mobility import DistrictMobility
 from coffee_analysis.household_coffee_spending import HouseholdCoffeeSpending
 from coffee_analysis.influence_area import InfluenceArea
+from coffee_analysis.metro_station_demand import MetroStationDemand
+from coffee_analysis.motiva_station_demand import MotivaStationDemand
 from coffee_analysis.opportunity_index import OpportunityIndex
+from coffee_analysis.origin_destination_survey import OriginDestinationSurvey
 from coffee_analysis.pilot_report import PilotReport
+from coffee_analysis.rail_stations import RailStations
 from coffee_analysis.rais_workforce import RaisWorkforce
+from coffee_analysis.station_flow import StationFlow
 from coffee_analysis.survival_analysis import SurvivalAnalysis
 
 
@@ -43,6 +49,12 @@ class PilotPipeline:
             "sobrevivencia": SurvivalAnalysis(database, directories, reference_date).build,
             "metricas": DistrictMetrics(database, directories, reference_date).build,
             "indice": OpportunityIndex(database, directories).build,
+            "pesquisa_od": OriginDestinationSurvey(directories).build,
+            "demanda_metro": MetroStationDemand(database, directories).build,
+            "demanda_motiva": MotivaStationDemand(database, directories).build,
+            "estacoes": RailStations(database, directories).build,
+            "fluxo_estacoes": StationFlow(database, directories).build,
+            "mobilidade": DistrictMobility(database, directories).build,
             "area_influencia": InfluenceArea(database, directories, candidates, reference_date).build,
             "relatorio": PilotReport(database, directories, pilot_district_codes, reference_date).build,
         }

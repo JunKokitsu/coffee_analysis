@@ -24,6 +24,20 @@ DEMAND_METRICS = MetricDefinitions(
         MetricDefinition("Mercado potencial café + lanches (R$/mês)", "mercado_potencial_mensal", NUMBER_FORMAT.rounded_currency, "Derivada"),
     )
 )
+MOBILITY_METRICS = MetricDefinitions(
+    (
+        MetricDefinition("Viagens diárias atraídas (trabalho, estudo, compras, serviços e lazer)", "viagens_atraidas_nao_residenciais", NUMBER_FORMAT.integer, "Pesquisa OD 2023"),
+        MetricDefinition("Viagens diárias atraídas por trabalho", "viagens_atraidas_trabalho", NUMBER_FORMAT.integer, "Pesquisa OD 2023"),
+        MetricDefinition("Viagens diárias atraídas por compras e serviços", "viagens_atraidas_compras_e_servicos", NUMBER_FORMAT.integer, "Pesquisa OD 2023"),
+        MetricDefinition("Viagens diárias atraídas por lazer e refeição", "viagens_atraidas_lazer_e_refeicao", NUMBER_FORMAT.integer, "Pesquisa OD 2023"),
+        MetricDefinition("Viagens atraídas por morador", "viagens_atraidas_por_morador", NUMBER_FORMAT.decimal, "Derivada"),
+        MetricDefinition("Viagens entrevistadas na amostra", "viagens_atraidas_amostra", NUMBER_FORMAT.integer, "Pesquisa OD 2023"),
+        MetricDefinition("Pessoas que trabalham no distrito (formais e informais)", "trabalhadores_no_distrito", NUMBER_FORMAT.integer, "Pesquisa OD 2023"),
+        MetricDefinition("Estações de metrô e trem (contadas por linha)", "estacoes_metro_trem", NUMBER_FORMAT.integer, "GeoSampa"),
+        MetricDefinition("Estações sem dado de demanda (CPTM)", "estacoes_sem_demanda", NUMBER_FORMAT.integer, "GeoSampa"),
+        MetricDefinition("Demanda média das estações em dias úteis", "demanda_estacoes_dias_uteis", NUMBER_FORMAT.integer, "Metrô e Motiva, 12 meses"),
+    )
+)
 COMPETITION_METRICS = MetricDefinitions(
     (
         MetricDefinition("Cafeterias ativas", "cafeterias_ativas", NUMBER_FORMAT.integer, "CNPJ"),
@@ -63,6 +77,11 @@ INFLUENCE_AREA_METRICS = MetricDefinitions(
         MetricDefinition("População residente", "populacao_residente", NUMBER_FORMAT.integer, "Censo 2022"),
         MetricDefinition("Empregos formais", "vinculos_formais", NUMBER_FORMAT.integer, "RAIS 2025"),
         MetricDefinition("Mercado potencial café + lanches (R$/mês)", "mercado_potencial_mensal", NUMBER_FORMAT.rounded_currency, "Derivada"),
+        MetricDefinition("Viagens diárias atraídas (exceto volta para casa)", "viagens_atraidas_nao_residenciais", NUMBER_FORMAT.integer, "Pesquisa OD 2023"),
+        MetricDefinition("Viagens diárias atraídas por trabalho", "viagens_atraidas_trabalho", NUMBER_FORMAT.integer, "Pesquisa OD 2023"),
+        MetricDefinition("Viagens entrevistadas na amostra", "viagens_atraidas_amostra", NUMBER_FORMAT.integer, "Pesquisa OD 2023"),
+        MetricDefinition("Estações de metrô e trem (por linha)", "estacoes_metro_trem", NUMBER_FORMAT.integer, "GeoSampa"),
+        MetricDefinition("Demanda média das estações em dias úteis", "demanda_estacoes_dias_uteis", NUMBER_FORMAT.integer, "Metrô e Motiva, 12 meses"),
         MetricDefinition("Cafeterias ativas", "cafeterias_ativas", NUMBER_FORMAT.integer, "CNPJ"),
         MetricDefinition("Lanchonetes ativas", "lanchonetes_ativas", NUMBER_FORMAT.integer, "CNPJ"),
         MetricDefinition("Padarias ativas", "padarias_ativas", NUMBER_FORMAT.integer, "CNPJ"),
@@ -118,15 +137,17 @@ class PilotReport:
     def _comparison_query(self) -> str:
         metrics = self._directories.processed_file("distritos_metricas.parquet")
         index = self._directories.processed_file("distritos_indice_oportunidade.parquet")
+        mobility = self._directories.marts_file("distritos_mobilidade.parquet")
         district_columns = ", ".join(
             f"max(valor) FILTER (WHERE codigo_distrito = '{code}') AS distrito_{position}"
             for position, code in enumerate(sorted(self._pilot_district_codes))
         )
         return f"""
             WITH completo AS (
-                SELECT metricas.*, indice.* EXCLUDE (codigo_distrito, nome_distrito)
+                SELECT metricas.*, indice.* EXCLUDE (codigo_distrito, nome_distrito), mobilidade.* EXCLUDE (codigo_distrito)
                 FROM '{metrics}' AS metricas
                 JOIN '{index}' AS indice USING (codigo_distrito)
+                JOIN '{mobility}' AS mobilidade USING (codigo_distrito)
             ),
             longo AS (
                 UNPIVOT (SELECT codigo_distrito, COLUMNS(* EXCLUDE (codigo_distrito, nome_distrito))::DOUBLE FROM completo)
@@ -143,6 +164,7 @@ class PilotReport:
         headers = ["Métrica", *self._district_names(), "Mediana dos 96 distritos", "Fonte"]
         groups = [
             ("Demanda", DEMAND_METRICS),
+            ("Fluxo de pessoas", MOBILITY_METRICS),
             ("Concorrência", COMPETITION_METRICS),
             ("Risco e custos", RISK_AND_COST_METRICS),
             ("Índice de oportunidade", INDEX_METRICS),

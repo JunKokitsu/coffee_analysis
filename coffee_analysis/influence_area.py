@@ -12,6 +12,7 @@ from coffee_analysis.influence_area_layers import InfluenceAreaLayers
 
 RADII_IN_METERS = (300, 500, 1000)
 GEOGRAPHIC_PROJECTION = "EPSG:4674"
+SURVEY_GEOGRAPHIC_PROJECTION = "EPSG:4326"
 METRIC_PROJECTION = "EPSG:31983"
 
 
@@ -42,22 +43,30 @@ class InfluenceArea:
     def _located_candidates(self) -> geopandas.GeoDataFrame:
         addresses_file = self._directories.processed_file("enderecos_cnefe.parquet")
         located = self._database.frame(self._candidates.locate_query(addresses_file))
-        return self._as_points(located.to_pandas())
+        return self._as_points(located.to_pandas(), GEOGRAPHIC_PROJECTION)
 
-    def _as_points(self, frame: pandas.DataFrame) -> geopandas.GeoDataFrame:
+    def _as_points(self, frame: pandas.DataFrame, projection: str) -> geopandas.GeoDataFrame:
         located_rows = frame[frame["latitude"].notna()]
         geometry = geopandas.points_from_xy(located_rows["longitude"], located_rows["latitude"])
-        points = geopandas.GeoDataFrame(located_rows, geometry=geometry, crs=GEOGRAPHIC_PROJECTION)
+        points = geopandas.GeoDataFrame(located_rows, geometry=geometry, crs=projection)
         return points.to_crs(METRIC_PROJECTION)
+
+    def _trip_destinations(self) -> geopandas.GeoDataFrame:
+        trips = pandas.read_parquet(self._directories.marts_file("viagens_destino.parquet"))
+        renamed = trips.rename(columns={"latitude_destino": "latitude", "longitude_destino": "longitude"})
+        return self._as_points(renamed, SURVEY_GEOGRAPHIC_PROJECTION)
 
     def _layers(self) -> InfluenceAreaLayers:
         metrics = pandas.read_parquet(self._directories.processed_file("distritos_metricas.parquet"))
         establishments = pandas.read_parquet(self._directories.processed_file("estabelecimentos_cafe.parquet"))
         jobs = pandas.read_parquet(self._directories.processed_file("rais_estabelecimentos_cep.parquet"))
+        stations = pandas.read_parquet(self._directories.marts_file("estacoes_demanda.parquet"))
         return InfluenceAreaLayers(
             sectors=self._sectors_with_spending(metrics),
-            establishments=self._as_points(establishments),
-            jobs=self._as_points(jobs),
+            establishments=self._as_points(establishments, GEOGRAPHIC_PROJECTION),
+            jobs=self._as_points(jobs, GEOGRAPHIC_PROJECTION),
+            trips=self._trip_destinations(),
+            stations=self._as_points(stations, SURVEY_GEOGRAPHIC_PROJECTION),
             city_spending_per_person=float(metrics["gasto_per_capita_cidade"].iloc[0]),
             reference_date=self._reference_date,
         )

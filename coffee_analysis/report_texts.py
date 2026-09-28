@@ -20,7 +20,8 @@ Todos os valores foram gerados pelo pipeline em `main.py` a partir das fontes p�
    - **Rua dos Pinheiros, 800:** 17 cafeterias, 8 abertas nos últimos 24 meses, e 27,8 mil empregos formais. O fluxo de trabalho é alto e a saturação também.
    - **Av. Campanella, 1000:** nenhuma cafeteria e 41 lanchonetes/padarias. É uma demanda de bairro, sensível a preço.
 6. **A margem do insumo está favorável.** Em 12 meses o arábica caiu 29% e o café moído caiu 19% no IPCA, enquanto o cafezinho subiu 7%.
-7. **No ranking, nenhum dos dois distritos está no topo.** Pinheiros ficou em 34º e Itaquera em 74º. Os primeiros colocados combinam mercado por ponto de venda acima da média, boa sobrevivência e m² moderado: Jaguaré, Morumbi, Campo Grande, Barra Funda e Butantã."""
+7. **No ranking, nenhum dos dois distritos está no topo.** Pinheiros ficou em 34º e Itaquera em 74º. Os primeiros colocados combinam mercado por ponto de venda acima da média, boa sobrevivência e m² moderado: Jaguaré, Morumbi, Campo Grande, Barra Funda e Butantã.
+8. **A Pesquisa OD confirma Pinheiros como polo de destino** (incluído em 28/09/2026). O distrito atrai 239 mil viagens por dia útil, ou 3,7 por morador, sendo 167 mil a trabalho. Suas estações somam 324 mil passageiros por dia. Itaquera atrai 173 mil viagens, 0,8 por morador, igual à mediana, com mais peso de compras e serviços (26 mil contra 20 mil em Pinheiros). No raio de 500 m, a Rua dos Pinheiros recebe 27,6 mil viagens por dia, contra 4,4 mil na Av. Campanella."""
 
     def district_note(self) -> str:
         return """"Mercado potencial" é o gasto mensal estimado das pessoas da região com café e lanches fora de casa. Ele combina o gasto por faixa de renda da POF com a renda domiciliar de cada setor censitário, a quantidade de domicílios em 2022 e os empregos formais do distrito, corrigido pelo IPCA do cafezinho e do lanche. A metade do consumo é atribuída ao local de moradia e a outra metade ao local de trabalho."""
@@ -32,7 +33,7 @@ Todos os valores foram gerados pelo pipeline em `main.py` a partir das fontes p�
         return """Quando o grão cai e o cafezinho sobe, o custo do insumo principal alivia enquanto o preço de venda continua subindo. É uma janela favorável de margem para quem abre agora, mas o preço do grão é volátil e pode inverter rápido."""
 
     def influence_area_note(self) -> str:
-        return """Cálculo por raio em torno do endereço. A população vem da área de cada setor censitário que cai dentro do círculo. Cafeterias e empregos são contados pelo endereço ou, na falta dele, pelo centro do CEP."""
+        return """Cálculo por raio em torno do endereço. A população vem da área de cada setor censitário que cai dentro do círculo. Cafeterias e empregos são contados pelo endereço ou, na falta dele, pelo centro do CEP. Viagens atraídas vêm dos destinos entrevistados na Pesquisa OD 2023, e estações são as que ficam dentro do raio."""
 
     def methodology(self) -> str:
         return """## 7. Metodologia e fontes
@@ -48,6 +49,10 @@ Todos os valores foram gerados pelo pipeline em `main.py` a partir das fontes p�
 | RAIS 2025 (MTE/PDET) | Empregos formais por distrito (pelo CEP do estabelecimento); porte das lanchonetes; salários | CNAE 5611-2/03 |
 | Prefeitura de SP – guias de ITBI 2026 | Preço mediano do m² de imóveis comerciais | Compra e venda de lojas ou imóveis de padrão comercial horizontal |
 | CEPEA/ESALQ (via Notícias Agrícolas) | Preço do café arábica | Indicador diário, um ponto por mês |
+| Metrô SP – Pesquisa Origem-Destino 2023 | Viagens atraídas por motivo (trabalho, estudo, compras, serviços, lazer, refeição) e pessoas que trabalham em cada distrito ou raio | Microdados com coordenadas do destino, expandidos pelo fator de viagem; dia útil típico |
+| Metrô SP – portal da transparência | Demanda média das estações em dias úteis (entradas + transferências) | Linhas 1, 2, 3 e 15; média dos últimos 12 meses |
+| Motiva (ViaQuatro e ViaMobilidade) | Demanda média das estações em dias úteis | Linhas 4, 5, 8 e 9; média dos últimos 12 meses |
+| Prefeitura de SP – GeoSampa | Localização das estações de metrô e trem em operação | Camadas `estacao_metro` e `estacao_trem` |
 
 **Classificação das cafeterias:** estabelecimentos com CNAE de alimentação cujo nome fantasia ou razão social contém CAFÉ, CAFETERIA, COFFEE, ESPRESSO, EXPRESSO, BARISTA ou TORRA. As demais lanchonetes (5611-2/03) e padarias contam como concorrência indireta. Padarias da CNAE 1091-1/02 só entram quando o nome indica padaria ou panificadora, para excluir confeitarias caseiras.
 
@@ -69,13 +74,16 @@ Distritos com menos de 30 negócios na amostra de sobrevivência ou com menos de
 - **CNPJ ativo não significa operando**: há atraso nas baixas, então a concorrência e a sobrevivência ficam superestimadas.
 - **Classificação por nome**: cafeterias sem "café" no nome entram como lanchonetes, e lanchonetes com "café" no nome entram como cafeterias.
 - **ITBI com poucas transações** em distritos periféricos. A amostra aparece na ficha e medianas com menos de 10 transações devem ser lidas com cautela.
-- **Parâmetro de 50% do consumo no trabalho**: é uma suposição, não uma medição. A Pesquisa Origem-Destino pode substituí-la."""
+- **Parâmetro de 50% do consumo no trabalho**: é uma suposição, não uma medição. A Pesquisa Origem-Destino já está integrada, mas ainda não substitui esse parâmetro no mercado potencial.
+- **Pesquisa OD é amostral**: nos raios de 300 m a amostra tem poucas dezenas de viagens entrevistadas. A linha "Viagens entrevistadas na amostra" mostra quantas, e valores com menos de 30 entrevistas devem ser lidos só como ordem de grandeza.
+- **Demanda das estações incompleta**: a CPTM (linhas 7, 10, 11, 12 e 13) e a Linha 6-Laranja ainda não têm fonte integrada. Distritos atendidos por essas linhas, como Itaquera, ficam com a demanda subestimada. A linha "Estações sem dado de demanda" mostra quantas faltam.
+- **Transferências contadas nas estações de integração**: a demanda publicada soma entradas e transferências, então quem troca de linha é contado de novo. Isso ainda é fluxo de pessoas passando pelo local, mas infla um pouco os polos de integração."""
 
     def next_steps(self) -> str:
         return """## 9. Próximos passos sugeridos
 
 1. Validar a classificação de cafeterias com uma amostra manual (ex.: 50 CNPJs por distrito comparados com o Google Maps).
-2. Trocar a proxy de empregos por fluxo real: Pesquisa Origem-Destino e demanda por estação do Metrô/CPTM.
+2. Usar as viagens atraídas da Pesquisa Origem-Destino no lugar da proxy de empregos formais no mercado potencial, e incluir a demanda por estação da CPTM.
 3. Incluir o valor venal do IPTU (cobertura total dos lotes) para complementar o ITBI nos distritos com poucas vendas.
 4. Calibrar os pesos do índice contra a sobrevivência observada das cafeterias abertas entre 2019 e 2022.
 5. Abrir a análise por endereço para qualquer ponto informado pelo cliente (o código já aceita novos endereços em `main.py`)."""
