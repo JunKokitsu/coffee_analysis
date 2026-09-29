@@ -16,17 +16,17 @@ class ConsumerPriceIndex:
     def build(self) -> Path:
         older_series = SidraTable(
             f"t/1419/n7/{METROPOLITAN_REGION_SAO_PAULO}/v/63/p/all/c315/{COFFEE_ITEMS}",
-            self._directories.raw_file("ipca", "ipca_1419_rmsp.json"),
+            self._directories.current_raw_file("ipca", "ipca_1419_rmsp.json"),
         )
         recent_series = SidraTable(
             f"t/7060/n7/{METROPOLITAN_REGION_SAO_PAULO}/v/63/p/all/c315/{COFFEE_ITEMS}",
-            self._directories.raw_file("ipca", "ipca_7060_rmsp.json"),
+            self._directories.current_raw_file("ipca", "ipca_7060_rmsp.json"),
         )
         older_file = older_series.download()
         recent_file = recent_series.download()
         return self._database.export_parquet(
             self._monthly_variation_query(older_file, recent_file),
-            self._directories.processed_file("ipca_cafe_rmsp.parquet"),
+            self._directories.staging_file("ipca", "variacao_mensal_rmsp.parquet"),
         )
 
     def _monthly_variation_query(self, older_file: Path, recent_file: Path) -> str:

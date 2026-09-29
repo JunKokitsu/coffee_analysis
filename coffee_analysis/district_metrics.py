@@ -18,12 +18,12 @@ class DistrictMetrics:
         self._reference_date = reference_date
 
     def build(self) -> Path:
-        destination = self._directories.processed_file("distritos_metricas.parquet")
+        destination = self._directories.marts_file("distritos_metricas_rais.parquet")
         self._database.export_parquet(self._metrics_query(), destination)
         return destination
 
     def _competition_query(self) -> str:
-        establishments = self._directories.processed_file("estabelecimentos_cafe.parquet")
+        establishments = self._directories.marts_file("estabelecimentos_cafe.parquet")
         reference = f"DATE '{self._reference_date.isoformat()}'"
         return f"""
             SELECT
@@ -44,12 +44,12 @@ class DistrictMetrics:
         """
 
     def _metrics_query(self) -> str:
-        districts = self._directories.processed_file("distritos_censo_2022_geometria.parquet")
-        income = self._directories.processed_file("distritos_renda_gasto_cafe.parquet")
-        prices = self._directories.processed_file("ipca_cafe_rmsp.parquet")
-        workforce = self._directories.processed_file("rais_distritos.parquet")
-        property_prices = self._directories.processed_file("itbi_preco_m2_comercial.parquet")
-        survival = self._directories.processed_file("sobrevivencia_distritos.parquet")
+        districts = self._directories.staging_file("censo_2022", "distritos.parquet")
+        income = self._directories.marts_file("distritos_renda_gasto_cafe.parquet")
+        prices = self._directories.staging_file("ipca", "variacao_mensal_rmsp.parquet")
+        workforce = self._directories.marts_file("distritos_empregos_formais.parquet")
+        property_prices = self._directories.marts_file("distritos_preco_m2_comercial.parquet")
+        survival = self._directories.marts_file("sobrevivencia_distritos.parquet")
         return f"""
             WITH fator AS (
                 SELECT

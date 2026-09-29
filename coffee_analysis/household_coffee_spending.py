@@ -21,7 +21,7 @@ class HouseholdCoffeeSpending:
         source = table.download()
         return self._database.export_parquet(
             self._spending_query(source),
-            self._directories.processed_file("pof_gasto_cafe_sp.parquet"),
+            self._directories.staging_file("pof", "gasto_cafe_sp.parquet"),
         )
 
     def _spending_query(self, source: Path) -> str:

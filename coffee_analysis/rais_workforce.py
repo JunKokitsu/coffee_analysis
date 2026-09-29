@@ -3,7 +3,6 @@ from pathlib import Path
 from coffee_analysis.analytical_database import AnalyticalDatabase
 from coffee_analysis.data_directories import DataDirectories
 
-RAIS_SAO_PAULO_MUNICIPALITY_CODE = "355030"
 SNACK_BAR_ACTIVITY = "5611203"
 FULL_TIME_WEEKLY_HOURS = 40
 
@@ -14,66 +13,40 @@ class RaisWorkforce:
         self._directories = directories
 
     def build(self) -> Path:
-        self._database.export_parquet(
-            self._district_jobs_query(),
-            self._directories.processed_file("rais_distritos.parquet"),
-        )
-        self._database.export_parquet(
-            self._establishment_jobs_query(),
-            self._directories.processed_file("rais_estabelecimentos_cep.parquet"),
-        )
-        return self._database.export_parquet(
-            self._wages_query(),
-            self._directories.processed_file("rais_salarios_lanchonetes.parquet"),
-        )
+        self._database.export_parquet(self._district_jobs_query(), self._directories.marts_file("distritos_empregos_formais.parquet"))
+        self._database.export_parquet(self._establishment_jobs_query(), self._directories.marts_file("empregos_formais_cep.parquet"))
+        return self._database.export_parquet(self._wages_query(), self._directories.marts_file("salarios_lanchonetes.parquet"))
 
-    def _establishments_source(self) -> str:
-        source = self._directories.raw_file("rais", "RAIS_ESTAB_PUB.COMT")
+    def _located_establishments(self) -> str:
+        establishments = self._directories.staging_file("rais", "estabelecimentos.parquet")
+        postal_codes = self._directories.staging_file("cnefe", "cep_distrito.parquet")
         return f"""
-            SELECT
-                lpad(trim("CEP Estab"), 8, '0') AS cep,
-                trim("CNAE 2.0 Subclasse - Codigo") AS cnae,
-                TRY_CAST("Qtd Vínculos Ativos" AS INTEGER) AS vinculos_ativos
-            FROM read_csv('{source}', delim=',', header=true, all_varchar=true, encoding='latin-1')
-            WHERE "Município - Código" = '{RAIS_SAO_PAULO_MUNICIPALITY_CODE}'
+            SELECT estabelecimentos.*, cep_distrito.codigo_distrito, cep_distrito.latitude, cep_distrito.longitude
+            FROM '{establishments}' AS estabelecimentos
+            JOIN '{postal_codes}' AS cep_distrito USING (cep)
         """
 
     def _establishment_jobs_query(self) -> str:
-        postal_codes = self._directories.processed_file("cep_distrito.parquet")
         return f"""
-            WITH estabelecimentos AS ({self._establishments_source()})
-            SELECT
-                estabelecimentos.cep,
-                cep_distrito.codigo_distrito,
-                cep_distrito.latitude,
-                cep_distrito.longitude,
-                sum(estabelecimentos.vinculos_ativos) AS vinculos_ativos
-            FROM estabelecimentos
-            JOIN '{postal_codes}' AS cep_distrito USING (cep)
+            SELECT cep, codigo_distrito, latitude, longitude, sum(vinculos_ativos) AS vinculos_ativos
+            FROM ({self._located_establishments()})
             GROUP BY ALL
         """
 
     def _district_jobs_query(self) -> str:
-        postal_codes = self._directories.processed_file("cep_distrito.parquet")
         return f"""
-            WITH estabelecimentos AS ({self._establishments_source()}),
-            localizados AS (
-                SELECT estabelecimentos.*, cep_distrito.codigo_distrito
-                FROM estabelecimentos
-                JOIN '{postal_codes}' AS cep_distrito USING (cep)
-            )
             SELECT
                 codigo_distrito,
                 sum(vinculos_ativos) AS vinculos_ativos_total,
                 count(*) FILTER (WHERE cnae = '{SNACK_BAR_ACTIVITY}' AND vinculos_ativos > 0) AS lanchonetes_com_empregados,
                 avg(vinculos_ativos) FILTER (WHERE cnae = '{SNACK_BAR_ACTIVITY}' AND vinculos_ativos > 0) AS media_vinculos_por_lanchonete,
                 median(vinculos_ativos) FILTER (WHERE cnae = '{SNACK_BAR_ACTIVITY}' AND vinculos_ativos > 0) AS mediana_vinculos_por_lanchonete
-            FROM localizados
+            FROM ({self._located_establishments()})
             GROUP BY codigo_distrito
         """
 
     def _wages_query(self) -> str:
-        source = self._directories.raw_file("rais", "RAIS_VINC_PUB_SP.COMT")
+        links = self._directories.staging_file("rais", "vinculos_alimentacao.parquet")
         return f"""
             WITH ocupacoes(codigo_ocupacao, ocupacao) AS (
                 VALUES
@@ -85,15 +58,9 @@ class RaisWorkforce:
                     ('141510', 'Gerente de restaurante')
             ),
             vinculos AS (
-                SELECT
-                    "CBO 2002 Ocupação - Código" AS codigo_ocupacao,
-                    TRY_CAST(replace("Vl Rem Média Nom", ',', '.') AS DOUBLE) AS remuneracao_media,
-                    TRY_CAST("Mês Admissão - Código" AS INTEGER) AS mes_admissao
-                FROM read_csv('{source}', delim=',', header=true, all_varchar=true, encoding='latin-1')
-                WHERE "Município - Código" = '{RAIS_SAO_PAULO_MUNICIPALITY_CODE}'
-                    AND trim("CNAE 2.0 Subclasse - Codigo") = '{SNACK_BAR_ACTIVITY}'
-                    AND "Ind Vínculo Ativo 31/12 - Código" = '1'
-                    AND TRY_CAST("Qtd Hora Contr" AS INTEGER) >= {FULL_TIME_WEEKLY_HOURS}
+                SELECT codigo_ocupacao, remuneracao_media, mes_admissao
+                FROM '{links}'
+                WHERE cnae = '{SNACK_BAR_ACTIVITY}' AND ativo_31_dezembro AND horas_contratadas >= {FULL_TIME_WEEKLY_HOURS}
             )
             SELECT
                 ocupacoes.codigo_ocupacao,

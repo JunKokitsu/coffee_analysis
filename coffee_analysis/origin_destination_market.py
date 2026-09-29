@@ -12,11 +12,11 @@ class OriginDestinationMarket:
         self._directories = directories
 
     def build(self) -> Path:
-        destination = self._directories.marts_file("distritos_metricas_od.parquet")
+        destination = self._directories.marts_file("distritos_metricas.parquet")
         return self._database.export_parquet(self._market_query(), destination)
 
     def _market_query(self) -> str:
-        metrics = self._directories.processed_file("distritos_metricas.parquet")
+        metrics = self._directories.marts_file("distritos_metricas_rais.parquet")
         mobility = self._directories.marts_file("distritos_mobilidade.parquet")
         return f"""
             WITH cidade AS (

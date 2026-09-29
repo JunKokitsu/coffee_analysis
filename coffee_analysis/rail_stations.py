@@ -19,7 +19,7 @@ class RailStations:
         return self._database.export_parquet(self._query(), destination)
 
     def _query(self) -> str:
-        competence = self._directories.latest_raw_competence("geosampa")
+        competence = self._directories.raw_competence("geosampa")
         sources = ", ".join(f"'{competence / f'{layer}.json'}'" for layer in STATION_LAYERS)
         return f"""
             WITH feicoes AS (

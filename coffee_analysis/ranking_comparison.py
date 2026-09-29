@@ -14,10 +14,10 @@ class RankingComparison:
         return self._database.export_parquet(self._comparison_query(), destination)
 
     def _comparison_query(self) -> str:
-        employment_metrics = self._directories.processed_file("distritos_metricas.parquet")
-        employment_index = self._directories.processed_file("distritos_indice_oportunidade.parquet")
-        survey_metrics = self._directories.marts_file("distritos_metricas_od.parquet")
-        survey_index = self._directories.marts_file("distritos_indice_oportunidade_od.parquet")
+        employment_metrics = self._directories.marts_file("distritos_metricas_rais.parquet")
+        employment_index = self._directories.marts_file("distritos_indice_oportunidade_rais.parquet")
+        survey_metrics = self._directories.marts_file("distritos_metricas.parquet")
+        survey_index = self._directories.marts_file("distritos_indice_oportunidade.parquet")
         return f"""
             SELECT
                 codigo_distrito,

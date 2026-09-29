@@ -24,7 +24,7 @@ class ArabicaPrices:
         frame = polars.DataFrame(valid_quotes, schema=["data", "preco_saca_60kg"], orient="row")
         unique_frame = frame.unique(subset="data")
         sorted_frame = unique_frame.sort("data")
-        destination = self._directories.processed_file("cepea_arabica.parquet")
+        destination = self._directories.staging_file("cepea", "arabica.parquet")
         sorted_frame.write_parquet(destination)
         return destination
 

@@ -14,35 +14,17 @@ class DistrictIncome:
     def build(self) -> Path:
         return self._database.export_parquet(
             self._district_query(),
-            self._directories.processed_file("distritos_renda_gasto_cafe.parquet"),
+            self._directories.marts_file("distritos_renda_gasto_cafe.parquet"),
         )
 
     def _district_query(self) -> str:
-        basic_file = self._directories.raw_file("ibge", "Basico_SP1.csv")
-        income_file = self._directories.raw_file("ibge", "DomicilioRenda_SP1.csv")
-        spending_file = self._directories.processed_file("pof_gasto_cafe_sp.parquet")
+        sectors_file = self._directories.staging_file("censo_2010", "setores_renda.parquet")
+        spending_file = self._directories.staging_file("pof", "gasto_cafe_sp.parquet")
         return f"""
-            WITH basico AS (
-                SELECT
-                    CAST(Cod_setor AS VARCHAR) AS codigo_setor,
-                    CAST(Cod_distrito AS VARCHAR) AS codigo_distrito,
-                    TRY_CAST(V001 AS DOUBLE) AS domicilios
-                FROM read_csv('{basic_file}', delim=';', header=true, all_varchar=true, encoding='latin-1')
-            ),
-            renda AS (
-                SELECT CAST(Cod_setor AS VARCHAR) AS codigo_setor, TRY_CAST(V003 AS DOUBLE) AS renda_total
-                FROM read_csv('{income_file}', delim=';', header=true, all_varchar=true, encoding='latin-1')
-            ),
-            setores AS (
-                SELECT
-                    basico.codigo_setor,
-                    basico.codigo_distrito,
-                    basico.domicilios,
-                    renda.renda_total,
-                    renda.renda_total / basico.domicilios AS renda_media_domiciliar
-                FROM basico
-                JOIN renda USING (codigo_setor)
-                WHERE basico.domicilios > 0 AND renda.renda_total IS NOT NULL
+            WITH setores AS (
+                SELECT *, renda_total / domicilios AS renda_media_domiciliar
+                FROM '{sectors_file}'
+                WHERE domicilios > 0 AND renda_total IS NOT NULL
             ),
             classes AS (
                 SELECT * FROM '{spending_file}' WHERE limite_inferior_salarios_minimos IS NOT NULL

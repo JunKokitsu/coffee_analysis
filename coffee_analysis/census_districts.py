@@ -6,7 +6,7 @@ import pyogrio
 from coffee_analysis.data_directories import DataDirectories
 
 SAO_PAULO_MUNICIPALITY_CODE = "3550308"
-METRIC_PROJECTION = "EPSG:31983"
+GEOGRAPHIC_PROJECTION = "EPSG:4326"
 
 
 class CensusDistricts:
@@ -15,10 +15,11 @@ class CensusDistricts:
 
     def build(self) -> Path:
         sectors = self._read_sectors()
-        sectors.to_parquet(self._directories.processed_file("setores_censo_2022.parquet"))
+        sectors.to_parquet(self._directories.staging_file("censo_2022", "setores.parquet"))
         districts = self._read_districts()
-        districts.to_parquet(self._directories.processed_file("distritos_censo_2022_geometria.parquet"))
-        return self._directories.processed_file("setores_censo_2022.parquet")
+        destination = self._directories.staging_file("censo_2022", "distritos.parquet")
+        districts.to_parquet(destination)
+        return destination
 
     def _read_sectors(self) -> geopandas.GeoDataFrame:
         source = self._directories.raw_file("ibge", "SP_setores_CD2022.gpkg")
@@ -37,7 +38,7 @@ class CensusDistricts:
             }
         )
         typed = renamed.astype({"populacao": "int64", "domicilios_ocupados": "int64"})
-        return typed.to_crs(METRIC_PROJECTION)
+        return typed.to_crs(GEOGRAPHIC_PROJECTION)
 
     def _read_districts(self) -> geopandas.GeoDataFrame:
         source = self._directories.raw_file("ibge", "SP_distritos_CD2022.gpkg")
@@ -56,4 +57,4 @@ class CensusDistricts:
             }
         )
         typed = renamed.astype({"area_km2": "float64", "populacao_2022": "int64", "domicilios_2022": "int64"})
-        return typed.to_crs(METRIC_PROJECTION)
+        return typed.to_crs(GEOGRAPHIC_PROJECTION)

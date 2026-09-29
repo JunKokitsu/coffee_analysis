@@ -9,23 +9,8 @@ Data de referência: {reference_date.strftime("%d/%m/%Y")}. Recorte: distritos d
 
 Todos os valores foram gerados pelo pipeline em `main.py` a partir das fontes públicas listadas na seção de metodologia. Os valores de mercado são **potenciais**, não previsão de faturamento."""
 
-    def findings(self) -> str:
-        return """## Principais achados (leitura do piloto em 23/09/2026)
-
-1. **Pinheiros tem o dobro de mercado, mas quase 8 vezes mais cafeterias por pessoa.** O mercado potencial de café + lanches é de cerca de R$ 2,0 milhões/mês, contra R$ 1,0 milhão em Itaquera. Porém são 129 cafeterias ativas (6,2 por 10 mil pessoas) contra 20 (0,8). O mercado por cafeteria cai para cerca de R$ 16 mil/mês, contra R$ 50 mil em Itaquera.
-2. **Somando lanchonetes e padarias, Itaquera é mais disputada.** Os 796 pontos de venda de café de Itaquera deixam R$ 1,3 mil/mês por ponto, o 10º percentil mais baixo da cidade. Pinheiros tem R$ 2,9 mil. A falta de cafeterias em Itaquera é uma oportunidade de diferenciação, não de mercado vazio.
-3. **Pinheiros tem alta rotatividade.** Em 24 meses abriram 41 cafeterias e fecharam 34. Ainda assim, a sobrevivência em 3 anos (71%) está acima da mediana da cidade (65%). Itaquera fica abaixo (62%) e teve saldo negativo de cafeterias.
-4. **O ponto custa 4 vezes mais em Pinheiros**: R$ 10,6 mil/m² contra R$ 2,5 mil em Itaquera. O valor de Itaquera vem de apenas 7 vendas e deve ser lido com cautela.
-5. **Os endereços-exemplo mostram perfis opostos.** Num raio de 500 m:
-   - **Rua dos Pinheiros, 800:** 17 cafeterias, 8 abertas nos últimos 24 meses, e 27,8 mil empregos formais. O fluxo de trabalho é alto e a saturação também.
-   - **Av. Campanella, 1000:** nenhuma cafeteria e 41 lanchonetes/padarias. É uma demanda de bairro, sensível a preço.
-6. **A margem do insumo está favorável.** Em 12 meses o arábica caiu 29% e o café moído caiu 19% no IPCA, enquanto o cafezinho subiu 7%.
-7. **No ranking, nenhum dos dois distritos está no topo.** Pinheiros ficou em 34º e Itaquera em 74º. Os primeiros colocados combinam mercado por ponto de venda acima da média, boa sobrevivência e m² moderado: Jaguaré, Morumbi, Campo Grande, Barra Funda e Butantã.
-8. **A Pesquisa OD confirma Pinheiros como polo de destino** (incluído em 28/09/2026). O distrito atrai 239 mil viagens por dia útil, ou 3,7 por morador, sendo 167 mil a trabalho. Suas estações somam 324 mil passageiros por dia. Itaquera atrai 173 mil viagens, 0,8 por morador, igual à mediana, com mais peso de compras e serviços (26 mil contra 20 mil em Pinheiros). No raio de 500 m, a Rua dos Pinheiros recebe 27,6 mil viagens por dia, contra 4,4 mil na Av. Campanella.
-9. **Medir o consumo fora de casa pela Pesquisa OD muda pouco o topo, mas corrige distritos com sedes de empresas** (incluído em 29/09/2026). Os dois rankings têm correlação de 0,94. Jaguaré cai do 1º para o 27º lugar e a Sé do 15º para o 45º, porque a RAIS registra ali mais empregos do que as pessoas que de fato trabalham no distrito: 78 mil vínculos contra 33 mil trabalhadores no Jaguaré. Sobem distritos com muitas viagens de trabalho informal, compras e estudo, como Freguesia do Ó (+23) e Bela Vista (+21). Na versão OD, Campo Grande assume o 1º lugar. Pinheiros vai para 37º e Itaquera para 75º. O mercado de Itaquera quase dobra (R$ 1,9 milhão/mês), mas os outros distritos também sobem e a posição não muda."""
-
     def district_note(self) -> str:
-        return """"Mercado potencial" é o gasto mensal estimado das pessoas da região com café e lanches fora de casa. Ele combina o gasto por faixa de renda da POF com a renda domiciliar de cada setor censitário, a quantidade de domicílios em 2022 e os empregos formais do distrito, corrigido pelo IPCA do cafezinho e do lanche. A metade do consumo é atribuída ao local de moradia e a outra metade ao local de trabalho. As linhas "versão Pesquisa OD" distribuem essa segunda metade pelas viagens atraídas de cada distrito, e não pelos empregos formais (ver seção 7)."""
+        return """"Mercado potencial" é o gasto mensal estimado das pessoas da região com café e lanches fora de casa. Ele combina o gasto por faixa de renda da POF com a renda domiciliar de cada setor censitário e a quantidade de domicílios em 2022, corrigido pelo IPCA do cafezinho e do lanche. A metade do consumo é atribuída ao local de moradia e a outra metade, o consumo fora de casa, é distribuída pelas viagens atraídas de cada distrito na Pesquisa OD 2023 (versão oficial desde 29/09/2026). As linhas "versão RAIS" mostram o cálculo anterior, que distribuía essa segunda metade pelos empregos formais (ver seção 7)."""
 
     def survival_note(self) -> str:
         return """Coortes de CNPJs abertos desde 2012. Um negócio conta como fechado quando está baixado, inapto ou suspenso e a data dessa situação é anterior ao horizonte. Como a Receita demora a registrar baixas, as taxas tendem a ser **otimistas**."""
@@ -39,8 +24,8 @@ Todos os valores foram gerados pelo pipeline em `main.py` a partir das fontes p�
     def ranking_comparison_note(self) -> str:
         return """As duas versões usam o mesmo índice e os mesmos pesos. Muda só a metade do mercado potencial atribuída ao consumo fora de casa:
 
-- **RAIS (versão atual):** empregos formais do distrito × gasto médio por habitante da cidade.
-- **Pesquisa OD:** o gasto fora de casa da cidade é distribuído entre os distritos na proporção das viagens atraídas em dia útil (trabalho, estudo, compras, serviços, lazer e refeição). Isso inclui trabalhadores informais, estudantes e clientes, e usa o endereço onde a pessoa realmente está, não a sede da empresa.
+- **Pesquisa OD (versão oficial):** o gasto fora de casa da cidade é distribuído entre os distritos na proporção das viagens atraídas em dia útil (trabalho, estudo, compras, serviços, lazer e refeição). Isso inclui trabalhadores informais, estudantes e clientes, e usa o endereço onde a pessoa realmente está, não a sede da empresa.
+- **RAIS (versão anterior, mantida para comparação):** empregos formais do distrito × gasto médio por habitante da cidade.
 
 Na versão OD, a soma dos distritos é igual ao gasto total dos moradores da cidade (R$ 139,5 milhões/mês). Na versão RAIS, a soma fica em R$ 97,3 milhões, porque só entram os empregos formais. Por isso os valores absolutos da versão OD são maiores. Para comparar as duas versões, use a posição no ranking."""
 
@@ -67,7 +52,7 @@ Na versão OD, a soma dos distritos é igual ao gasto total dos moradores da cid
 
 **Índice de oportunidade:** média ponderada dos percentis entre os 96 distritos. Pesos:
 
-- mercado por ponto de venda: 40%;
+- mercado por ponto de venda (versão Pesquisa OD): 40%;
 - sobrevivência em 3 anos: 25%;
 - pressão de novas cafeterias: 15%, invertida;
 - preço do m² comercial: 20%, invertido.
@@ -79,12 +64,12 @@ Distritos com menos de 30 negócios na amostra de sobrevivência ou com menos de
 
 - **Renda de 2010**: o Censo 2022 ainda não publicou a renda por setor. Bairros que mudaram muito de perfil desde 2010 ficam distorcidos.
 - **A POF subestima o consumo fora de casa**: o café costuma ser registrado junto com o lanche e as despesas pequenas são subdeclaradas. Os valores absolutos de mercado ficam abaixo do faturamento real do setor. Por isso servem para **comparar regiões**, não para projetar receita.
-- **Empregos pela sede**: a RAIS registra os vínculos no CEP do estabelecimento declarante. Sedes de grandes empresas concentram empregos que, na prática, estão espalhados pela cidade.
+- **Empregos pela sede**: a RAIS registra os vínculos no CEP do estabelecimento declarante. Sedes de grandes empresas concentram empregos que, na prática, estão espalhados pela cidade. Isso afeta a versão RAIS do ranking e as áreas de influência, mas não a versão oficial (Pesquisa OD).
 - **CNPJ ativo não significa operando**: há atraso nas baixas, então a concorrência e a sobrevivência ficam superestimadas.
 - **Classificação por nome**: cafeterias sem "café" no nome entram como lanchonetes, e lanchonetes com "café" no nome entram como cafeterias.
 - **ITBI com poucas transações** em distritos periféricos. A amostra aparece na ficha e medianas com menos de 10 transações devem ser lidas com cautela.
 - **Parâmetro de 50% do consumo fora de casa**: é uma suposição, não uma medição. A Pesquisa OD mede onde o consumo fora de casa acontece, mas não quanto dele acontece fora de casa. O parâmetro vale nas duas versões do ranking.
-- **Mercado OD nos raios pequenos**: nos raios de 300 m e 500 m a versão OD se apoia em poucas viagens entrevistadas e oscila muito entre raios. Nesses casos, prefira a versão RAIS ou o raio de 1.000 m.
+- **Mercado OD nos raios pequenos**: nos raios de 300 m e 500 m a versão OD se apoia em poucas viagens entrevistadas e oscila muito entre raios. Por isso, nas áreas de influência a referência continua sendo a versão RAIS, e a versão OD aparece como complemento.
 - **Pesquisa OD é amostral**: nos raios de 300 m a amostra tem poucas dezenas de viagens entrevistadas. A linha "Viagens entrevistadas na amostra" mostra quantas, e valores com menos de 30 entrevistas devem ser lidos só como ordem de grandeza.
 - **Demanda das estações incompleta**: a CPTM (linhas 7, 10, 11, 12 e 13) e a Linha 6-Laranja ainda não têm fonte integrada. Distritos atendidos por essas linhas, como Itaquera, ficam com a demanda subestimada. A linha "Estações sem dado de demanda" mostra quantas faltam.
 - **Transferências contadas nas estações de integração**: a demanda publicada soma entradas e transferências, então quem troca de linha é contado de novo. Isso ainda é fluxo de pessoas passando pelo local, mas infla um pouco os polos de integração."""
@@ -93,7 +78,7 @@ Distritos com menos de 30 negócios na amostra de sobrevivência ou com menos de
         return """## 10. Próximos passos sugeridos
 
 1. Validar a classificação de cafeterias com uma amostra manual (ex.: 50 CNPJs por distrito comparados com o Google Maps).
-2. Decidir qual versão do mercado potencial (RAIS ou Pesquisa OD) passa a ser a oficial do índice, e incluir a demanda por estação da CPTM.
+2. Incluir a demanda por estação da CPTM e da Linha 6-Laranja quando houver fonte aberta.
 3. Incluir o valor venal do IPTU (cobertura total dos lotes) para complementar o ITBI nos distritos com poucas vendas.
 4. Calibrar os pesos do índice contra a sobrevivência observada das cafeterias abertas entre 2019 e 2022.
 5. Abrir a análise por endereço para qualquer ponto informado pelo cliente (o código já aceita novos endereços em `main.py`)."""

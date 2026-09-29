@@ -17,11 +17,11 @@ class SurvivalAnalysis:
     def build(self) -> Path:
         return self._database.export_parquet(
             self._survival_query(),
-            self._directories.processed_file("sobrevivencia_distritos.parquet"),
+            self._directories.marts_file("sobrevivencia_distritos.parquet"),
         )
 
     def _survival_query(self) -> str:
-        establishments = self._directories.processed_file("estabelecimentos_cafe.parquet")
+        establishments = self._directories.marts_file("estabelecimentos_cafe.parquet")
         return f"""
             WITH coortes AS (
                 SELECT

@@ -162,11 +162,11 @@ engenharia de dados que consome e cruza fontes diferentes, atualizado mensalment
 
 | Tema | Decisão | Situação |
 |---|---|---|
-| Versionamento | Git, repositório **privado** no GitHub pessoal (conta `JunKokitsu`). Dados (`data/`) ficam fora do repositório | Em andamento |
+| Versionamento | Git, repositório **privado** no GitHub pessoal (conta `JunKokitsu`). Dados (`data/`) ficam fora do repositório | Feito |
 | Armazenamento | DuckDB local + arquivos Parquet. Sem warehouse/lakehouse por enquanto | Mantido |
-| Camadas de dados | Três camadas no disco (ver 9.2) | A implementar |
-| Orquestração | Apache Airflow, uma DAG com execução **mensal** | A implementar |
-| Qualidade de dados | Testes e validações automatizadas (ver 9.4) | **Lembrete: implementar mais tarde** |
+| Camadas de dados | Três camadas no disco (ver 9.2) | **Feito em 29/09/2026** (`data/processed/` removida) |
+| Orquestração | Apache Airflow, uma DAG com execução **mensal** | **Feito em 29/09/2026** (ver 9.3) |
+| Qualidade de dados | Testes e validações automatizadas (ver 9.4) | **Feito em 29/09/2026** |
 
 ### 9.2 Camadas
 
@@ -191,8 +191,15 @@ limpam uma fonte, como `cnpj_*`, `cepea_arabica`, `ipca_cafe_rmsp`, `setores_cen
 
 ### 9.3 Orquestração (Airflow)
 
-- Uma DAG `atualizacao_mensal_cafeterias`, agendada para rodar **uma vez por mês**. O dia será
-  definido depois da publicação mensal do CNPJ pela Receita, que é a fonte mais pesada.
+- Uma DAG `atualizacao_mensal_cafeterias` (`dags/`), agendada para o **dia 20 de cada mês às 6h**
+  (cron `0 6 20 * *`). A Receita publicou o CNPJ de setembro/2026 antes do dia 23. Se a publicação
+  atrasar, a tarefa `baixar_cnpj` usa a última publicação disponível até a competência. Esse dia
+  deve ser revisto depois de alguns meses de observação.
+- Implementação: Airflow 3.3.2 em Docker Compose (`docker compose up airflow`, interface em
+  `localhost:8080`). As tarefas chamam `scripts/baixar_fontes.sh <fonte>` e
+  `main.py <etapa> --competencia AAAA-MM`. As dependências entre etapas ficam em
+  `coffee_analysis/pipeline_graph.py`, que é lido pela DAG e testado no pytest. A execução manual
+  aceita o parâmetro `competencia`.
 - Uma tarefa de download e uma de staging por fonte, que rodam em paralelo entre fontes. As
   tarefas de marts dependem das tabelas de staging que usam, e o relatório vem por último.
 - As tarefas são idempotentes: reexecutar uma competência sobrescreve só a pasta daquela
@@ -202,19 +209,27 @@ limpam uma fonte, como `cnpj_*`, `cepea_arabica`, `ipca_cafe_rmsp`, `setores_cen
 - O Airflow roda localmente (Docker Compose ou `airflow standalone`) e chama as mesmas classes
   do pacote `coffee_analysis`. A lógica não fica nas DAGs.
 
-### 9.4 Lembrete: qualidade de dados (implementar mais tarde)
+### 9.4 Qualidade de dados (implementada em 29/09/2026)
 
-> **Pendente.** Ainda não há nenhuma validação automatizada. Quando for implementar, cobrir:
->
-> - testes unitários das transformações (pytest);
-> - validação de esquema na staging (colunas, tipos, chaves não nulas e únicas);
-> - checagens de volume entre competências (ex.: variação de mais de X% no número de CNPJs de SP
->   bloqueia a publicação dos marts);
-> - integridade referencial das chaves de cruzamento (todo `codigo_distrito` existe na malha do
->   Censo, todo `cnae` existe na tabela da CONCLA);
-> - uma tarefa de qualidade na DAG do Airflow entre staging e marts.
+- **Testes unitários** (`uv run pytest`, pasta `tests/`): formatação, grafo de etapas, competência,
+  leitura da planilha do Metrô, índice de oportunidade, mercado OD e verificações de qualidade.
+- **Validação da staging** (etapa `qualidade`, classes `TableExpectation` e `TableExpectations`).
+  Cada uma das 18 tabelas de staging é verificada quanto a:
+  - esquema (colunas obrigatórias);
+  - volume mínimo;
+  - chaves não nulas;
+  - chaves únicas;
+  - integridade do `codigo_distrito` contra a malha do Censo 2022, nas tabelas que têm distrito.
+- **Variação de volume entre competências.** O histórico fica em
+  `data/quality/historico_volumes.parquet`. A tolerância é de 10% para o CNPJ e de 30% para as
+  demais tabelas.
+- **Bloqueio:** qualquer falha levanta `DataQualityError`. Na DAG, isso impede os marts e o
+  relatório de rodar. O resultado de cada competência fica em
+  `data/quality/resultado_<competência>.parquet` e aparece no dashboard.
+- **Ainda não coberto:** a integridade do `cnae` contra a tabela da CONCLA, que não está integrada.
+  Hoje o filtro de CNAEs de alimentação é aplicado na própria staging do CNPJ.
 
-## 10. Integração de novas fontes (prioridade atual)
+## 10. Integração de novas fontes
 
 Ordem combinada: integrar as fontes novas primeiro, já seguindo as camadas da seção 9.2, e depois
 migrar o restante do pipeline e montar a DAG do Airflow.
@@ -245,7 +260,7 @@ Tabelas geradas pelas fontes integradas:
 | marts | `distritos_indice_oportunidade_od.parquet` | Índice de oportunidade calculado sobre o mercado OD, com os mesmos pesos |
 | marts | `distritos_comparacao_ranking.parquet` | Posição, índice e mercado por ponto de venda nas versões RAIS e OD, lado a lado |
 
-### 10.1 Mercado potencial pela Pesquisa OD (29/09/2026, em avaliação)
+### 10.1 Mercado potencial pela Pesquisa OD (versão oficial desde 29/09/2026)
 
 A metade do mercado potencial atribuída ao consumo fora de casa continua em 50%. Na versão OD,
 o gasto fora de casa da cidade é distribuído entre os distritos na proporção das viagens atraídas
@@ -258,10 +273,30 @@ duas versões lado a lado (seção 7). Resultados:
 - as maiores subidas são Freguesia do Ó (+23), Bela Vista (+21) e São Mateus (+20);
 - Pinheiros vai de 34º para 37º e Itaquera de 74º para 75º.
 
-**Decisão pendente:** qual versão passa a ser a oficial do índice. Nos raios de 300 m e 500 m a
-versão OD tem amostra pequena. Nos raios, a versão RAIS continua sendo a referência.
+**Decisão (29/09/2026): a versão Pesquisa OD passa a ser a oficial do índice por distrito.** A
+versão RAIS continua sendo calculada (`distritos_metricas_rais`, `distritos_indice_oportunidade_rais`)
+e aparece lado a lado no relatório e no dashboard. O porquê:
 
-## 11. Execução autônoma (próxima etapa)
+1. **Mede onde as pessoas estão, não onde a empresa declara.** A RAIS registra o vínculo no CEP do
+   estabelecimento declarante, então sedes concentram empregos que, na prática, estão espalhados.
+   O caso mais claro é o Jaguaré, que liderava o ranking com 78 mil vínculos formais, mas onde só
+   33 mil pessoas trabalham segundo a OD. Essa distorção já estava listada como limitação.
+2. **Cobre quem a RAIS não vê:** trabalhadores informais, estudantes e clientes de compras, serviços
+   e lazer, que também consomem café fora de casa.
+3. **É coerente com o total da cidade.** O gasto fora de casa é distribuído integralmente (a soma dos
+   distritos dá o gasto dos moradores), enquanto a versão RAIS perdia a parte de quem não tem emprego
+   formal.
+4. **Muda pouco onde não há distorção.** A correlação entre as posições é de 0,94 e 8 dos 10
+   primeiros se mantêm. A troca corrige casos específicos e não embaralha o ranking.
+5. **A amostra é suficiente por distrito:** o 10º percentil tem 140 viagens entrevistadas por
+   distrito.
+
+**Exceção:** nas áreas de influência (raios de 300 m, 500 m e 1.000 m) a referência continua sendo
+a versão RAIS, porque nos raios pequenos a OD tem de 10 a 70 viagens entrevistadas e oscila muito.
+A versão OD aparece como complemento. O parâmetro de 50% de consumo fora de casa continua sendo uma
+suposição nas duas versões.
+
+## 11. Execução autônoma (concluída em 29/09/2026)
 
 Levantamento de 29/09/2026. Hoje o pipeline roda de ponta a ponta, mas não sozinho. É preciso
 executar `scripts/baixar_fontes.sh` e `main.py` à mão, e há valores fixos que envelhecem a cada mês:
@@ -273,15 +308,29 @@ executar `scripts/baixar_fontes.sh` e `main.py` à mão, e há valores fixos que
 | `main.py` | `REFERENCE_DATE = date(2026, 9, 23)` | Aberturas, fechamentos e sobrevivência ficam presos a setembro |
 | `coffee_analysis/report_texts.py` | "Principais achados" escritos à mão | Tabelas atualizadas com achados desatualizados |
 
-Ordem de execução:
+Ordem executada em 29/09/2026: migração para staging/marts → passos 1 a 4 → passo 5.
 
 | Passo | Entrega | Situação |
 |---|---|---|
-| 1 | **Competência como parâmetro**: competência e data de referência recebidas de fora (linha de comando ou DAG); descoberta automática do último mês do CNPJ, do último ano da RAIS e do arquivo mais recente do ITBI | A implementar |
-| 2 | **Qualidade de dados** (seção 9.4): validação da staging e checagem de volume entre competências que bloqueia a publicação dos marts | A implementar (sai do "lembrete para depois": sem ela a execução autônoma publica dados quebrados) |
-| 3 | **DAG do Airflow** (seção 9.3): agendamento mensal, tarefas por fonte, tarefa de qualidade entre staging e marts | A implementar |
-| 4 | **Achados automáticos**: achados do relatório gerados a partir dos marts, ou separados num texto de análise revisado por uma pessoa | A implementar |
-| 5 | **Dashboard**: ferramenta a definir (Streamlit, Metabase, Power BI…) lendo os marts | A definir |
+| 0 | **Migração** de `data/processed/` para staging e marts. As classes que misturavam limpeza e regra de negócio (renda 2010, RAIS, ITBI e CNPJ) foram separadas em uma classe de staging e outra de mart. A camada bruta dos dados mensais e anuais fica em pastas de competência (`cnpj/2026-09`, `rais/2025`, `itbi/2026-08-27`, `ipca/2026-09`) | **Feito** |
+| 1 | **Competência como parâmetro**: `main.py --competencia AAAA-MM [--data-referencia AAAA-MM-DD]`. A data de referência padrão é o menor valor entre hoje e o último dia da competência. `baixar_fontes.sh [fonte…]` descobre sozinho o último mês do CNPJ, o último ano da RAIS e o arquivo mais recente do ITBI | **Feito** |
+| 2 | **Qualidade de dados** (seção 9.4) | **Feito** |
+| 3 | **DAG do Airflow** (seção 9.3) | **Feito** |
+| 4 | **Achados automáticos** (`ReportFindings`): gerados dos marts a cada execução, com texto factual. A interpretação de negócio fica para quem revisa o relatório | **Feito** |
+| 5 | **Dashboard** em Streamlit + Plotly (`dashboard_app.py`, `coffee_analysis/dashboard/`), lendo os marts. Abas: visão geral (mapa, ranking e alternância entre as versões OD e RAIS), distrito × mediana, endereços por raio, e método e qualidade. Rodar com `uv run streamlit run dashboard_app.py` ou `docker compose up dashboard` (`localhost:8501`) | **Feito** |
+
+Correção feita durante a migração: a atribuição de distrito a endereços e CEPs na divisa entre
+distritos não era determinística (`mode`/`any_value` com empate), e cada execução podia mudar
+algumas centenas de estabelecimentos de distrito. Agora vence o distrito com mais endereços e, no
+empate, o de menor código. Os números finais, da execução completa pela DAG em 29/09/2026 com data
+de referência 29/09/2026, colocam Pinheiros em 36º e Itaquera em 75º no ranking oficial, e Campo
+Grande em 1º.
+
+Pendente depois desta etapa:
+
+- integrar as fontes da seção 10 que faltam (zoneamento do GeoSampa, alvarás, IPTU e Novo CAGED),
+  já dentro da DAG;
+- observar as primeiras execuções mensais e calibrar o dia do agendamento e as tolerâncias de volume.
 
 Fontes com publicação anual ou esporádica (Censo, POF, Pesquisa OD) continuam com verificação de
 versão nova. A troca de versão dessas fontes pode exigir ajuste manual no código.

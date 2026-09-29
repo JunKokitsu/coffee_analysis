@@ -12,7 +12,7 @@ class MetroStationDemand:
         self._directories = directories
 
     def build(self) -> Path:
-        competence = self._directories.latest_raw_competence("metro")
+        competence = self._directories.raw_competence("metro")
         sheets = [MetroDemandSheet(path) for path in sorted(competence.glob("demanda_estacoes_*.csv"))]
         records = [record for sheet in sheets for record in sheet.records()]
         return self._table.export(records, self._directories.staging_file("metro", "demanda_estacoes.parquet"))

@@ -21,7 +21,7 @@ class StationFlow:
             geometry=geopandas.points_from_xy(stations["longitude"], stations["latitude"]),
             crs=GEOGRAPHIC_PROJECTION,
         )
-        districts = geopandas.read_parquet(self._directories.processed_file("distritos_censo_2022_geometria.parquet"))
+        districts = geopandas.read_parquet(self._directories.staging_file("censo_2022", "distritos.parquet"))
         located = geopandas.sjoin(points.to_crs(districts.crs), districts[["codigo_distrito", "geometry"]], how="left", predicate="within")
         destination = self._directories.marts_file("estacoes_demanda.parquet")
         located.drop(columns=["geometry", "index_right"]).to_parquet(destination, index=False)

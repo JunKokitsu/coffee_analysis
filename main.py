@@ -1,13 +1,14 @@
-import sys
+import argparse
 from datetime import date
 from pathlib import Path
 
 from coffee_analysis.candidate_address import CandidateAddress
 from coffee_analysis.candidate_addresses import CandidateAddresses
+from coffee_analysis.competence import Competence
 from coffee_analysis.data_directories import DataDirectories
 from coffee_analysis.pilot_pipeline import PilotPipeline
+from coffee_analysis.pipeline_graph import STEP_LAYERS
 
-REFERENCE_DATE = date(2026, 9, 23)
 PILOT_DISTRICT_CODES = ("355030862", "355030837")
 PILOT_CANDIDATES = CandidateAddresses(
     (
@@ -17,10 +18,21 @@ PILOT_CANDIDATES = CandidateAddresses(
 )
 
 
+def parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Pipeline de métricas para novas cafeterias em São Paulo")
+    parser.add_argument("etapas", nargs="*", choices=list(STEP_LAYERS), help="etapas a executar, na ordem; vazio executa todas")
+    parser.add_argument("--competencia", default=Competence.of(date.today()).month, help="competência no formato AAAA-MM")
+    parser.add_argument("--data-referencia", type=date.fromisoformat, default=None, help="data de referência AAAA-MM-DD")
+    return parser.parse_args()
+
+
 def main() -> None:
-    directories = DataDirectories(Path(__file__).parent)
-    pipeline = PilotPipeline(directories, PILOT_CANDIDATES, PILOT_DISTRICT_CODES, REFERENCE_DATE)
-    pipeline.run(sys.argv[1:])
+    arguments = parse_arguments()
+    competence = Competence(arguments.competencia)
+    reference_date = arguments.data_referencia or competence.reference_date(date.today())
+    directories = DataDirectories(Path(__file__).parent, competence.month)
+    pipeline = PilotPipeline(directories, PILOT_CANDIDATES, PILOT_DISTRICT_CODES, reference_date)
+    pipeline.run(arguments.etapas)
 
 
 if __name__ == "__main__":

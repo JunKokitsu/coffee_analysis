@@ -38,7 +38,7 @@ class RankingComparisonSection:
     def render(self) -> str:
         return "\n\n".join(
             [
-                "## 7. Ranking com o mercado pela Pesquisa OD (comparação lado a lado)",
+                "## 7. Comparação: ranking oficial (Pesquisa OD) × versão RAIS",
                 self._note,
                 self._summary(),
                 "### 10 primeiros em qualquer das versões + distritos do piloto",

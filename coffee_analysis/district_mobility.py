@@ -16,7 +16,7 @@ class DistrictMobility:
         self._directories = directories
 
     def build(self) -> Path:
-        districts = geopandas.read_parquet(self._directories.processed_file("distritos_censo_2022_geometria.parquet"))
+        districts = geopandas.read_parquet(self._directories.staging_file("censo_2022", "distritos.parquet"))
         trips = pandas.read_parquet(self._directories.staging_file("pesquisa_od", "viagens.parquet"))
         people = pandas.read_parquet(self._directories.staging_file("pesquisa_od", "pessoas.parquet"))
         self._database.register_frame("viagens_localizadas", self._located(trips, "destino", districts))
@@ -55,7 +55,7 @@ class DistrictMobility:
         """
 
     def _districts_query(self) -> str:
-        districts = self._directories.processed_file("distritos_censo_2022_geometria.parquet")
+        districts = self._directories.staging_file("censo_2022", "distritos.parquet")
         trips = self._directories.marts_file("viagens_destino.parquet")
         stations = self._directories.marts_file("estacoes_demanda.parquet")
         return f"""

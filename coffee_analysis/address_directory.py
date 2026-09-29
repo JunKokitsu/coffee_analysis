@@ -11,8 +11,8 @@ class AddressDirectory:
 
     def build(self) -> Path:
         self._database.execute(self._addresses_view())
-        self._database.export_parquet(self._addresses_query(), self._directories.processed_file("enderecos_cnefe.parquet"))
-        return self._database.export_parquet(self._postal_code_query(), self._directories.processed_file("cep_distrito.parquet"))
+        self._database.export_parquet(self._addresses_query(), self._directories.staging_file("cnefe", "enderecos.parquet"))
+        return self._database.export_parquet(self._postal_code_query(), self._directories.staging_file("cnefe", "cep_distrito.parquet"))
 
     def _addresses_view(self) -> str:
         source = self._directories.raw_file("ibge", "3550308_SAO_PAULO.csv")
@@ -32,17 +32,33 @@ class AddressDirectory:
 
     def _addresses_query(self) -> str:
         return """
-            SELECT
-                cep,
-                logradouro,
-                numero,
-                mode(codigo_distrito) AS codigo_distrito,
-                avg(latitude) AS latitude,
-                avg(longitude) AS longitude,
-                count(*) AS quantidade_enderecos,
-                count(*) FILTER (WHERE codigo_especie = '6') AS quantidade_estabelecimentos
-            FROM enderecos_cnefe_bruto
-            GROUP BY cep, logradouro, numero
+            WITH distrito_por_endereco AS (
+                SELECT cep, logradouro, numero, codigo_distrito, count(*) AS quantidade
+                FROM enderecos_cnefe_bruto
+                GROUP BY cep, logradouro, numero, codigo_distrito
+            ),
+            distrito_predominante AS (
+                SELECT cep, logradouro, numero, arg_max(codigo_distrito, (quantidade, -CAST(codigo_distrito AS BIGINT))) AS codigo_distrito
+                FROM distrito_por_endereco
+                GROUP BY cep, logradouro, numero
+            ),
+            agregado AS (
+                SELECT
+                    cep,
+                    logradouro,
+                    numero,
+                    avg(latitude) AS latitude,
+                    avg(longitude) AS longitude,
+                    count(*) AS quantidade_enderecos,
+                    count(*) FILTER (WHERE codigo_especie = '6') AS quantidade_estabelecimentos
+                FROM enderecos_cnefe_bruto
+                GROUP BY cep, logradouro, numero
+            )
+            SELECT agregado.cep, agregado.logradouro, agregado.numero, distrito_predominante.codigo_distrito, agregado.* EXCLUDE (cep, logradouro, numero)
+            FROM agregado
+            JOIN distrito_predominante ON agregado.cep IS NOT DISTINCT FROM distrito_predominante.cep
+                AND agregado.logradouro IS NOT DISTINCT FROM distrito_predominante.logradouro
+                AND agregado.numero IS NOT DISTINCT FROM distrito_predominante.numero
         """
 
     def _postal_code_query(self) -> str:
@@ -53,7 +69,7 @@ class AddressDirectory:
                 GROUP BY cep, codigo_distrito
             ),
             ordenado AS (
-                SELECT *, row_number() OVER (PARTITION BY cep ORDER BY quantidade DESC) AS posicao
+                SELECT *, row_number() OVER (PARTITION BY cep ORDER BY quantidade DESC, codigo_distrito) AS posicao
                 FROM contagem
             ),
             centroide AS (
