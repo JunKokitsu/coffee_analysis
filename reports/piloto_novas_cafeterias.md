@@ -16,10 +16,11 @@ Todos os valores foram gerados pelo pipeline em `main.py` a partir das fontes p�
 6. **A margem do insumo está favorável.** Em 12 meses o arábica caiu 29% e o café moído caiu 19% no IPCA, enquanto o cafezinho subiu 7%.
 7. **No ranking, nenhum dos dois distritos está no topo.** Pinheiros ficou em 34º e Itaquera em 74º. Os primeiros colocados combinam mercado por ponto de venda acima da média, boa sobrevivência e m² moderado: Jaguaré, Morumbi, Campo Grande, Barra Funda e Butantã.
 8. **A Pesquisa OD confirma Pinheiros como polo de destino** (incluído em 28/09/2026). O distrito atrai 239 mil viagens por dia útil, ou 3,7 por morador, sendo 167 mil a trabalho. Suas estações somam 324 mil passageiros por dia. Itaquera atrai 173 mil viagens, 0,8 por morador, igual à mediana, com mais peso de compras e serviços (26 mil contra 20 mil em Pinheiros). No raio de 500 m, a Rua dos Pinheiros recebe 27,6 mil viagens por dia, contra 4,4 mil na Av. Campanella.
+9. **Medir o consumo fora de casa pela Pesquisa OD muda pouco o topo, mas corrige distritos com sedes de empresas** (incluído em 29/09/2026). Os dois rankings têm correlação de 0,94. Jaguaré cai do 1º para o 27º lugar e a Sé do 15º para o 45º, porque a RAIS registra ali mais empregos do que as pessoas que de fato trabalham no distrito: 78 mil vínculos contra 33 mil trabalhadores no Jaguaré. Sobem distritos com muitas viagens de trabalho informal, compras e estudo, como Freguesia do Ó (+23) e Bela Vista (+21). Na versão OD, Campo Grande assume o 1º lugar. Pinheiros vai para 37º e Itaquera para 75º. O mercado de Itaquera quase dobra (R$ 1,9 milhão/mês), mas os outros distritos também sobem e a posição não muda.
 
 ## 1. Ficha comparativa dos distritos
 
-"Mercado potencial" é o gasto mensal estimado das pessoas da região com café e lanches fora de casa. Ele combina o gasto por faixa de renda da POF com a renda domiciliar de cada setor censitário, a quantidade de domicílios em 2022 e os empregos formais do distrito, corrigido pelo IPCA do cafezinho e do lanche. A metade do consumo é atribuída ao local de moradia e a outra metade ao local de trabalho.
+"Mercado potencial" é o gasto mensal estimado das pessoas da região com café e lanches fora de casa. Ele combina o gasto por faixa de renda da POF com a renda domiciliar de cada setor censitário, a quantidade de domicílios em 2022 e os empregos formais do distrito, corrigido pelo IPCA do cafezinho e do lanche. A metade do consumo é atribuída ao local de moradia e a outra metade ao local de trabalho. As linhas "versão Pesquisa OD" distribuem essa segunda metade pelas viagens atraídas de cada distrito, e não pelos empregos formais (ver seção 7).
 
 ### Demanda
 
@@ -33,6 +34,7 @@ Todos os valores foram gerados pelo pipeline em `main.py` a partir das fontes p�
 | Gasto com café + lanches fora de casa por domicílio (R$/mês) | R$ 21,71 | R$ 74,14 | R$ 27,67 | POF 2017-18 + IPCA |
 | Mercado potencial de café fora de casa (R$/mês) | R$ 300.092 | R$ 623.684 | R$ 270.266 | Derivada |
 | Mercado potencial café + lanches (R$/mês) | R$ 1.001.061 | R$ 2.028.608 | R$ 878.323 | Derivada |
+| Mercado potencial café + lanches, fora de casa pela Pesquisa OD (R$/mês) | R$ 1.874.723 | R$ 2.621.681 | R$ 1.293.080 | Derivada |
 
 ### Fluxo de pessoas
 
@@ -59,6 +61,7 @@ Todos os valores foram gerados pelo pipeline em `main.py` a partir das fontes p�
 | Cafeterias por 10 mil pessoas (residentes + empregos) | 0,8 | 6,2 | 0,7 | Derivada |
 | Mercado café + lanches por cafeteria (R$/mês) | R$ 50.053 | R$ 15.726 | R$ 76.163 | Derivada |
 | Mercado café + lanches por ponto de venda (R$/mês) | R$ 1.258 | R$ 2.919 | R$ 2.257 | Derivada |
+| Mercado café + lanches por ponto de venda, versão Pesquisa OD (R$/mês) | R$ 2.355 | R$ 3.772 | R$ 3.266 | Derivada |
 | Cafeterias abertas nos últimos 12 meses | 0 | 20 | 1 | CNPJ |
 | Cafeterias abertas nos últimos 24 meses | 2 | 41 | 2 | CNPJ |
 | Cafeterias fechadas nos últimos 24 meses | 3 | 34 | 3 | CNPJ |
@@ -85,6 +88,8 @@ Todos os valores foram gerados pelo pipeline em `main.py` a partir das fontes p�
 | Percentil do custo do m² | 12,5% | 94,4% | 50,0% | Derivada |
 | **Índice de oportunidade (0 a 100)** | 37,0 | 57,9 | 53,5 | Derivada |
 | **Posição no ranking (de 96 distritos)** | 74 | 34 | 48 | Derivada |
+| Índice de oportunidade, versão Pesquisa OD (0 a 100) | 37,9 | 56,2 | 52,5 | Derivada |
+| Posição no ranking, versão Pesquisa OD | 75 | 37 | 48 | Derivada |
 
 ## 2. Sobrevivência dos negócios
 
@@ -132,10 +137,10 @@ Coortes de CNPJs abertos desde 2012. Um negócio conta como fechado quando está
 
 | Indicador | Variação em 12 meses | Variação desde jan/2018 |
 | --- | --- | --- |
+| IPCA RMSP - Cafezinho (até 202608) | +7,0% | +125,9% |
 | IPCA RMSP - Índice geral (até 202608) | +4,5% | +57,4% |
 | IPCA RMSP - Café moído (até 202608) | -18,7% | +138,4% |
 | IPCA RMSP - Lanche (até 202608) | +7,0% | +101,8% |
-| IPCA RMSP - Cafezinho (até 202608) | +7,0% | +125,9% |
 | Café arábica CEPEA/ESALQ (saca de 60 kg) | -29,1% | n/d |
 
 | Data | Arábica CEPEA/ESALQ (R$/saca de 60 kg) |
@@ -167,6 +172,7 @@ Cálculo por raio em torno do endereço. A população vem da área de cada seto
 | População residente | 4.388 | 12.217 | 37.480 | Censo 2022 |
 | Empregos formais | 267 | 674 | 3.247 | RAIS 2025 |
 | Mercado potencial café + lanches (R$/mês) | R$ 19.115 | R$ 53.196 | R$ 167.001 | Derivada |
+| Mercado potencial café + lanches, fora de casa pela Pesquisa OD (R$/mês) | R$ 31.241 | R$ 75.881 | R$ 511.693 | Derivada |
 | Viagens diárias atraídas (exceto volta para casa) | 2.243 | 4.369 | 59.443 | Pesquisa OD 2023 |
 | Viagens diárias atraídas por trabalho | 1.037 | 1.050 | 26.628 | Pesquisa OD 2023 |
 | Viagens entrevistadas na amostra | 10 | 17 | 159 | Pesquisa OD 2023 |
@@ -178,6 +184,7 @@ Cálculo por raio em torno do endereço. A população vem da área de cada seto
 | Cafeterias abertas em 24 meses | 0 | 0 | 0 | CNPJ |
 | Mercado por cafeteria (R$/mês) | n/d | n/d | R$ 83.501 | Derivada |
 | Mercado por ponto de venda (R$/mês) | R$ 1.593 | R$ 1.297 | R$ 1.256 | Derivada |
+| Mercado por ponto de venda, versão Pesquisa OD (R$/mês) | R$ 2.603 | R$ 1.851 | R$ 3.847 | Derivada |
 
 ### Rua dos Pinheiros, 800 (Pinheiros)
 
@@ -186,6 +193,7 @@ Cálculo por raio em torno do endereço. A população vem da área de cada seto
 | População residente | 3.875 | 10.285 | 30.641 | Censo 2022 |
 | Empregos formais | 4.893 | 27.812 | 81.455 | RAIS 2025 |
 | Mercado potencial café + lanches (R$/mês) | R$ 100.702 | R$ 356.164 | R$ 1.064.226 | Derivada |
+| Mercado potencial café + lanches, fora de casa pela Pesquisa OD (R$/mês) | R$ 134.778 | R$ 355.680 | R$ 1.221.348 | Derivada |
 | Viagens diárias atraídas (exceto volta para casa) | 10.419 | 27.552 | 106.551 | Pesquisa OD 2023 |
 | Viagens diárias atraídas por trabalho | 8.630 | 17.733 | 77.857 | Pesquisa OD 2023 |
 | Viagens entrevistadas na amostra | 70 | 188 | 626 | Pesquisa OD 2023 |
@@ -197,8 +205,9 @@ Cálculo por raio em torno do endereço. A população vem da área de cada seto
 | Cafeterias abertas em 24 meses | 4 | 8 | 22 | CNPJ |
 | Mercado por cafeteria (R$/mês) | R$ 12.588 | R$ 20.951 | R$ 15.884 | Derivada |
 | Mercado por ponto de venda (R$/mês) | R$ 3.357 | R$ 3.425 | R$ 2.815 | Derivada |
+| Mercado por ponto de venda, versão Pesquisa OD (R$/mês) | R$ 4.493 | R$ 3.420 | R$ 3.231 | Derivada |
 
-## 6. Ranking do índice de oportunidade (10 primeiros + distritos do piloto)
+## 6. Ranking do índice de oportunidade, versão RAIS (10 primeiros + distritos do piloto)
 
 | Posição | Distrito | Índice | Mercado por ponto de venda (R$/mês) | Sobrevivência 3 anos | Cafeterias ativas | m² comercial (R$) |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -215,7 +224,52 @@ Cálculo por raio em torno do endereço. A população vem da área de cada seto
 | 34 | Pinheiros | 57,9 | R$ 2.919 | 71,1% | 129 | R$ 10.600 |
 | 74 | Itaquera | 37,0 | R$ 1.258 | 61,6% | 20 | R$ 2.500 |
 
-## 7. Metodologia e fontes
+## 7. Ranking com o mercado pela Pesquisa OD (comparação lado a lado)
+
+As duas versões usam o mesmo índice e os mesmos pesos. Muda só a metade do mercado potencial atribuída ao consumo fora de casa:
+
+- **RAIS (versão atual):** empregos formais do distrito × gasto médio por habitante da cidade.
+- **Pesquisa OD:** o gasto fora de casa da cidade é distribuído entre os distritos na proporção das viagens atraídas em dia útil (trabalho, estudo, compras, serviços, lazer e refeição). Isso inclui trabalhadores informais, estudantes e clientes, e usa o endereço onde a pessoa realmente está, não a sede da empresa.
+
+Na versão OD, a soma dos distritos é igual ao gasto total dos moradores da cidade (R$ 139,5 milhões/mês). Na versão RAIS, a soma fica em R$ 97,3 milhões, porque só entram os empregos formais. Por isso os valores absolutos da versão OD são maiores. Para comparar as duas versões, use a posição no ranking.
+
+Correlação entre as posições nas duas versões: **0,94**. Em média, um distrito muda **6,7 posições**, e 8 dos 10 primeiros continuam no topo.
+
+### 10 primeiros em qualquer das versões + distritos do piloto
+
+| Distrito | Posição (RAIS) | Posição (OD) | Posições ganhas | Índice (RAIS) | Índice (OD) | Mercado por ponto de venda (RAIS) | Mercado por ponto de venda (OD) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Campo Grande | 3 | 1 | +2 | 74,7 | 77,2 | R$ 3.500 | R$ 4.657 |
+| Butantã | 5 | 2 | +3 | 74,0 | 76,1 | R$ 4.014 | R$ 5.933 |
+| Barra Funda | 4 | 3 | +1 | 74,3 | 76,0 | R$ 3.874 | R$ 5.425 |
+| Morumbi | 2 | 4 | -2 | 74,7 | 74,7 | R$ 6.794 | R$ 8.448 |
+| Liberdade | 12 | 5 | +7 | 67,6 | 71,9 | R$ 2.431 | R$ 3.776 |
+| Vila Mariana | 9 | 6 | +3 | 68,9 | 70,2 | R$ 4.286 | R$ 6.063 |
+| Campo Belo | 6 | 7 | -1 | 71,3 | 70,0 | R$ 4.450 | R$ 5.234 |
+| Moema | 8 | 8 | +0 | 69,2 | 69,2 | R$ 5.507 | R$ 7.444 |
+| Saúde | 11 | 9 | +2 | 67,7 | 68,1 | R$ 3.769 | R$ 4.593 |
+| Raposo Tavares | 7 | 10 | -3 | 70,6 | 67,6 | R$ 2.377 | R$ 3.132 |
+| Cambuci | 10 | 20 | -10 | 68,5 | 64,3 | R$ 2.994 | R$ 3.647 |
+| Jaguaré | 1 | 27 | -26 | 76,3 | 60,7 | R$ 4.436 | R$ 3.344 |
+| Pinheiros | 34 | 37 | -3 | 57,9 | 56,2 | R$ 2.919 | R$ 3.772 |
+| Itaquera | 74 | 75 | -1 | 37,0 | 37,9 | R$ 1.258 | R$ 2.355 |
+
+### 5 maiores subidas e 5 maiores quedas com a Pesquisa OD
+
+| Distrito | Posição (RAIS) | Posição (OD) | Posições ganhas | Índice (RAIS) | Índice (OD) | Mercado por ponto de venda (RAIS) | Mercado por ponto de venda (OD) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Freguesia do Ó | 40 | 17 | +23 | 56,4 | 65,3 | R$ 2.124 | R$ 3.668 |
+| Bela Vista | 35 | 14 | +21 | 57,8 | 65,8 | R$ 2.470 | R$ 4.205 |
+| São Mateus | 62 | 42 | +20 | 44,9 | 54,6 | R$ 1.670 | R$ 3.275 |
+| Vila Prudente | 36 | 18 | +18 | 57,8 | 65,0 | R$ 2.421 | R$ 4.025 |
+| Penha | 67 | 52 | +15 | 42,0 | 51,7 | R$ 1.993 | R$ 3.590 |
+| Sé | 15 | 45 | -30 | 67,0 | 53,5 | R$ 3.334 | R$ 3.037 |
+| Jaguaré | 1 | 27 | -26 | 76,3 | 60,7 | R$ 4.436 | R$ 3.344 |
+| Parque do Carmo | 31 | 51 | -20 | 59,4 | 51,8 | R$ 2.232 | R$ 2.713 |
+| Vila Matilde | 54 | 74 | -20 | 49,3 | 37,9 | R$ 2.525 | R$ 2.897 |
+| Marsilac | 60 | 79 | -19 | 45,6 | 35,5 | R$ 1.892 | R$ 2.377 |
+
+## 8. Metodologia e fontes
 
 | Fonte | Uso no piloto | Referência |
 | --- | --- | --- |
@@ -244,7 +298,7 @@ Cálculo por raio em torno do endereço. A população vem da área de cada seto
 
 Distritos com menos de 30 negócios na amostra de sobrevivência ou com menos de 5 vendas comerciais no ITBI recebem percentil neutro (50%) nesse componente, para que amostras pequenas não distorçam o ranking. Os pesos são uma proposta inicial e devem ser calibrados.
 
-## 8. Limitações conhecidas
+## 9. Limitações conhecidas
 
 - **Renda de 2010**: o Censo 2022 ainda não publicou a renda por setor. Bairros que mudaram muito de perfil desde 2010 ficam distorcidos.
 - **A POF subestima o consumo fora de casa**: o café costuma ser registrado junto com o lanche e as despesas pequenas são subdeclaradas. Os valores absolutos de mercado ficam abaixo do faturamento real do setor. Por isso servem para **comparar regiões**, não para projetar receita.
@@ -252,15 +306,16 @@ Distritos com menos de 30 negócios na amostra de sobrevivência ou com menos de
 - **CNPJ ativo não significa operando**: há atraso nas baixas, então a concorrência e a sobrevivência ficam superestimadas.
 - **Classificação por nome**: cafeterias sem "café" no nome entram como lanchonetes, e lanchonetes com "café" no nome entram como cafeterias.
 - **ITBI com poucas transações** em distritos periféricos. A amostra aparece na ficha e medianas com menos de 10 transações devem ser lidas com cautela.
-- **Parâmetro de 50% do consumo no trabalho**: é uma suposição, não uma medição. A Pesquisa Origem-Destino já está integrada, mas ainda não substitui esse parâmetro no mercado potencial.
+- **Parâmetro de 50% do consumo fora de casa**: é uma suposição, não uma medição. A Pesquisa OD mede onde o consumo fora de casa acontece, mas não quanto dele acontece fora de casa. O parâmetro vale nas duas versões do ranking.
+- **Mercado OD nos raios pequenos**: nos raios de 300 m e 500 m a versão OD se apoia em poucas viagens entrevistadas e oscila muito entre raios. Nesses casos, prefira a versão RAIS ou o raio de 1.000 m.
 - **Pesquisa OD é amostral**: nos raios de 300 m a amostra tem poucas dezenas de viagens entrevistadas. A linha "Viagens entrevistadas na amostra" mostra quantas, e valores com menos de 30 entrevistas devem ser lidos só como ordem de grandeza.
 - **Demanda das estações incompleta**: a CPTM (linhas 7, 10, 11, 12 e 13) e a Linha 6-Laranja ainda não têm fonte integrada. Distritos atendidos por essas linhas, como Itaquera, ficam com a demanda subestimada. A linha "Estações sem dado de demanda" mostra quantas faltam.
 - **Transferências contadas nas estações de integração**: a demanda publicada soma entradas e transferências, então quem troca de linha é contado de novo. Isso ainda é fluxo de pessoas passando pelo local, mas infla um pouco os polos de integração.
 
-## 9. Próximos passos sugeridos
+## 10. Próximos passos sugeridos
 
 1. Validar a classificação de cafeterias com uma amostra manual (ex.: 50 CNPJs por distrito comparados com o Google Maps).
-2. Usar as viagens atraídas da Pesquisa Origem-Destino no lugar da proxy de empregos formais no mercado potencial, e incluir a demanda por estação da CPTM.
+2. Decidir qual versão do mercado potencial (RAIS ou Pesquisa OD) passa a ser a oficial do índice, e incluir a demanda por estação da CPTM.
 3. Incluir o valor venal do IPTU (cobertura total dos lotes) para complementar o ITBI nos distritos com poucas vendas.
 4. Calibrar os pesos do índice contra a sobrevivência observada das cafeterias abertas entre 2019 e 2022.
 5. Abrir a análise por endereço para qualquer ponto informado pelo cliente (o código já aceita novos endereços em `main.py`).

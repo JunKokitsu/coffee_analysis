@@ -19,9 +19,11 @@ from coffee_analysis.influence_area import InfluenceArea
 from coffee_analysis.metro_station_demand import MetroStationDemand
 from coffee_analysis.motiva_station_demand import MotivaStationDemand
 from coffee_analysis.opportunity_index import OpportunityIndex
+from coffee_analysis.origin_destination_market import OriginDestinationMarket
 from coffee_analysis.origin_destination_survey import OriginDestinationSurvey
 from coffee_analysis.pilot_report import PilotReport
 from coffee_analysis.rail_stations import RailStations
+from coffee_analysis.ranking_comparison import RankingComparison
 from coffee_analysis.rais_workforce import RaisWorkforce
 from coffee_analysis.station_flow import StationFlow
 from coffee_analysis.survival_analysis import SurvivalAnalysis
@@ -48,13 +50,24 @@ class PilotPipeline:
             "cnpj": CoffeeShopRegistry(database, directories).build,
             "sobrevivencia": SurvivalAnalysis(database, directories, reference_date).build,
             "metricas": DistrictMetrics(database, directories, reference_date).build,
-            "indice": OpportunityIndex(database, directories).build,
+            "indice": OpportunityIndex(
+                database,
+                directories.processed_file("distritos_metricas.parquet"),
+                directories.processed_file("distritos_indice_oportunidade.parquet"),
+            ).build,
             "pesquisa_od": OriginDestinationSurvey(directories).build,
             "demanda_metro": MetroStationDemand(database, directories).build,
             "demanda_motiva": MotivaStationDemand(database, directories).build,
             "estacoes": RailStations(database, directories).build,
             "fluxo_estacoes": StationFlow(database, directories).build,
             "mobilidade": DistrictMobility(database, directories).build,
+            "mercado_od": OriginDestinationMarket(database, directories).build,
+            "indice_od": OpportunityIndex(
+                database,
+                directories.marts_file("distritos_metricas_od.parquet"),
+                directories.marts_file("distritos_indice_oportunidade_od.parquet"),
+            ).build,
+            "comparacao_ranking": RankingComparison(database, directories).build,
             "area_influencia": InfluenceArea(database, directories, candidates, reference_date).build,
             "relatorio": PilotReport(database, directories, pilot_district_codes, reference_date).build,
         }

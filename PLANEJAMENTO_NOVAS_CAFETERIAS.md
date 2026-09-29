@@ -241,6 +241,47 @@ Tabelas geradas pelas fontes integradas:
 | marts | `estacoes_demanda.parquet` | Estação + demanda média dos últimos 12 meses + distrito |
 | marts | `viagens_destino.parquet` | Destinos das viagens com categoria de motivo e distrito |
 | marts | `distritos_mobilidade.parquet` | Viagens atraídas, trabalhadores, estações e demanda por distrito |
+| marts | `distritos_metricas_od.parquet` | Métricas por distrito com o mercado potencial fora de casa distribuído pelas viagens atraídas da OD |
+| marts | `distritos_indice_oportunidade_od.parquet` | Índice de oportunidade calculado sobre o mercado OD, com os mesmos pesos |
+| marts | `distritos_comparacao_ranking.parquet` | Posição, índice e mercado por ponto de venda nas versões RAIS e OD, lado a lado |
 
-Próximo passo sugerido para essas fontes: substituir a proxy de 50% do consumo no local de
-trabalho (empregos RAIS) pelas viagens atraídas da Pesquisa OD no cálculo do mercado potencial.
+### 10.1 Mercado potencial pela Pesquisa OD (29/09/2026, em avaliação)
+
+A metade do mercado potencial atribuída ao consumo fora de casa continua em 50%. Na versão OD,
+o gasto fora de casa da cidade é distribuído entre os distritos na proporção das viagens atraídas
+não residenciais, em vez de empregos formais da RAIS × gasto per capita. O relatório mostra as
+duas versões lado a lado (seção 7). Resultados:
+
+- correlação de 0,94 entre as posições e mudança média de 6,7 posições. 8 dos 10 primeiros se mantêm;
+- as maiores quedas são de distritos com sedes que inflam a RAIS: Jaguaré (1º → 27º, 78 mil vínculos
+  contra 33 mil trabalhadores na OD) e Sé (15º → 45º);
+- as maiores subidas são Freguesia do Ó (+23), Bela Vista (+21) e São Mateus (+20);
+- Pinheiros vai de 34º para 37º e Itaquera de 74º para 75º.
+
+**Decisão pendente:** qual versão passa a ser a oficial do índice. Nos raios de 300 m e 500 m a
+versão OD tem amostra pequena. Nos raios, a versão RAIS continua sendo a referência.
+
+## 11. Execução autônoma (próxima etapa)
+
+Levantamento de 29/09/2026. Hoje o pipeline roda de ponta a ponta, mas não sozinho. É preciso
+executar `scripts/baixar_fontes.sh` e `main.py` à mão, e há valores fixos que envelhecem a cada mês:
+
+| Onde | Valor fixo | Efeito |
+|---|---|---|
+| `scripts/baixar_fontes.sh` | `MES_CNPJ=2026-09` como padrão | Continua baixando o CNPJ de setembro |
+| `scripts/baixar_fontes.sh` | RAIS `2025` e URL do ITBI com data (`27082026`) | Não pega versões novas |
+| `main.py` | `REFERENCE_DATE = date(2026, 9, 23)` | Aberturas, fechamentos e sobrevivência ficam presos a setembro |
+| `coffee_analysis/report_texts.py` | "Principais achados" escritos à mão | Tabelas atualizadas com achados desatualizados |
+
+Ordem de execução:
+
+| Passo | Entrega | Situação |
+|---|---|---|
+| 1 | **Competência como parâmetro**: competência e data de referência recebidas de fora (linha de comando ou DAG); descoberta automática do último mês do CNPJ, do último ano da RAIS e do arquivo mais recente do ITBI | A implementar |
+| 2 | **Qualidade de dados** (seção 9.4): validação da staging e checagem de volume entre competências que bloqueia a publicação dos marts | A implementar (sai do "lembrete para depois": sem ela a execução autônoma publica dados quebrados) |
+| 3 | **DAG do Airflow** (seção 9.3): agendamento mensal, tarefas por fonte, tarefa de qualidade entre staging e marts | A implementar |
+| 4 | **Achados automáticos**: achados do relatório gerados a partir dos marts, ou separados num texto de análise revisado por uma pessoa | A implementar |
+| 5 | **Dashboard**: ferramenta a definir (Streamlit, Metabase, Power BI…) lendo os marts | A definir |
+
+Fontes com publicação anual ou esporádica (Censo, POF, Pesquisa OD) continuam com verificação de
+versão nova. A troca de versão dessas fontes pode exigir ajuste manual no código.

@@ -61,6 +61,7 @@ class InfluenceArea:
         establishments = pandas.read_parquet(self._directories.processed_file("estabelecimentos_cafe.parquet"))
         jobs = pandas.read_parquet(self._directories.processed_file("rais_estabelecimentos_cep.parquet"))
         stations = pandas.read_parquet(self._directories.marts_file("estacoes_demanda.parquet"))
+        survey_metrics = pandas.read_parquet(self._directories.marts_file("distritos_metricas_od.parquet"))
         return InfluenceAreaLayers(
             sectors=self._sectors_with_spending(metrics),
             establishments=self._as_points(establishments, GEOGRAPHIC_PROJECTION),
@@ -68,6 +69,7 @@ class InfluenceArea:
             trips=self._trip_destinations(),
             stations=self._as_points(stations, SURVEY_GEOGRAPHIC_PROJECTION),
             city_spending_per_person=float(metrics["gasto_per_capita_cidade"].iloc[0]),
+            city_spending_per_attracted_trip=float(survey_metrics["gasto_por_viagem_atraida_cidade"].iloc[0]),
             reference_date=self._reference_date,
         )
 

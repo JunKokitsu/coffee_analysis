@@ -17,6 +17,7 @@ class InfluenceAreaLayers:
         trips: geopandas.GeoDataFrame,
         stations: geopandas.GeoDataFrame,
         city_spending_per_person: float,
+        city_spending_per_attracted_trip: float,
         reference_date: date,
     ) -> None:
         self._sectors = sectors
@@ -25,6 +26,7 @@ class InfluenceAreaLayers:
         self._trips = trips[trips["categoria_motivo"] != "residencia"]
         self._stations = stations
         self._city_spending_per_person = city_spending_per_person
+        self._city_spending_per_attracted_trip = city_spending_per_attracted_trip
         self._recent_opening_limit = pandas.Timestamp(reference_date - timedelta(days=RECENT_OPENING_DAYS))
 
     def summarize(self, candidate: str, location: BaseGeometry, radius: int) -> dict[str, float | int | str]:
@@ -32,11 +34,13 @@ class InfluenceAreaLayers:
         demand = self._demand(circle)
         competition = self._competition(circle)
         market = demand["mercado_potencial_mensal"]
+        survey_market = demand["mercado_potencial_mensal_od"]
         direct_competitors = competition["cafeterias_ativas"]
         sale_points = direct_competitors + competition["lanchonetes_ativas"] + competition["padarias_ativas"]
         ratios = {
             "mercado_mensal_por_cafeteria": self._ratio(market, direct_competitors),
             "mercado_mensal_por_ponto_de_venda": self._ratio(market, sale_points),
+            "mercado_mensal_por_ponto_de_venda_od": self._ratio(survey_market, sale_points),
         }
         identification: dict[str, float | int | str] = {"endereco_candidato": candidate, "raio_metros": radius}
         return {**identification, **demand, **self._mobility(circle), **competition, **ratios}
@@ -57,12 +61,16 @@ class InfluenceAreaLayers:
         formal_jobs = float(nearby_jobs["vinculos_ativos"].sum())
         workplace_spending = formal_jobs * self._city_spending_per_person
         market = (1 - WORKPLACE_CONSUMPTION_SHARE) * resident_spending + WORKPLACE_CONSUMPTION_SHARE * workplace_spending
+        nearby_trips = self._trips[self._trips.within(circle)]
+        away_from_home_spending = float(nearby_trips["fator_expansao_viagem"].sum()) * self._city_spending_per_attracted_trip
+        survey_market = (1 - WORKPLACE_CONSUMPTION_SHARE) * resident_spending + WORKPLACE_CONSUMPTION_SHARE * away_from_home_spending
         return {
             "populacao_residente": population,
             "domicilios": float(households.sum()),
             "vinculos_formais": formal_jobs,
             "gasto_mensal_residentes": resident_spending,
             "mercado_potencial_mensal": market,
+            "mercado_potencial_mensal_od": survey_market,
         }
 
     def _mobility(self, circle: BaseGeometry) -> dict[str, float]:

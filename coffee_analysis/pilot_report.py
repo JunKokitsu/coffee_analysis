@@ -9,6 +9,7 @@ from coffee_analysis.data_directories import DataDirectories
 from coffee_analysis.markdown_table import MarkdownTable
 from coffee_analysis.metric_definition import MetricDefinition
 from coffee_analysis.metric_definitions import MetricDefinitions
+from coffee_analysis.ranking_comparison_section import RankingComparisonSection
 from coffee_analysis.report_texts import ReportTexts
 
 NUMBER_FORMAT = BrazilianNumberFormat()
@@ -22,6 +23,7 @@ DEMAND_METRICS = MetricDefinitions(
         MetricDefinition("Gasto com café + lanches fora de casa por domicílio (R$/mês)", "gasto_cesta_cafeteria_por_domicilio_atual", NUMBER_FORMAT.currency, "POF 2017-18 + IPCA"),
         MetricDefinition("Mercado potencial de café fora de casa (R$/mês)", "mercado_cafe_mensal", NUMBER_FORMAT.rounded_currency, "Derivada"),
         MetricDefinition("Mercado potencial café + lanches (R$/mês)", "mercado_potencial_mensal", NUMBER_FORMAT.rounded_currency, "Derivada"),
+        MetricDefinition("Mercado potencial café + lanches, fora de casa pela Pesquisa OD (R$/mês)", "mercado_potencial_mensal_od", NUMBER_FORMAT.rounded_currency, "Derivada"),
     )
 )
 MOBILITY_METRICS = MetricDefinitions(
@@ -46,6 +48,7 @@ COMPETITION_METRICS = MetricDefinitions(
         MetricDefinition("Cafeterias por 10 mil pessoas (residentes + empregos)", "cafeterias_por_10_mil_pessoas", NUMBER_FORMAT.decimal, "Derivada"),
         MetricDefinition("Mercado café + lanches por cafeteria (R$/mês)", "mercado_mensal_por_cafeteria", NUMBER_FORMAT.rounded_currency, "Derivada"),
         MetricDefinition("Mercado café + lanches por ponto de venda (R$/mês)", "mercado_mensal_por_ponto_de_venda", NUMBER_FORMAT.rounded_currency, "Derivada"),
+        MetricDefinition("Mercado café + lanches por ponto de venda, versão Pesquisa OD (R$/mês)", "mercado_mensal_por_ponto_de_venda_od", NUMBER_FORMAT.rounded_currency, "Derivada"),
         MetricDefinition("Cafeterias abertas nos últimos 12 meses", "cafeterias_abertas_12_meses", NUMBER_FORMAT.integer, "CNPJ"),
         MetricDefinition("Cafeterias abertas nos últimos 24 meses", "cafeterias_abertas_24_meses", NUMBER_FORMAT.integer, "CNPJ"),
         MetricDefinition("Cafeterias fechadas nos últimos 24 meses", "cafeterias_fechadas_24_meses", NUMBER_FORMAT.integer, "CNPJ"),
@@ -70,6 +73,8 @@ INDEX_METRICS = MetricDefinitions(
         MetricDefinition("Percentil do custo do m²", "percentil_custo_ocupacao", NUMBER_FORMAT.percentage, "Derivada"),
         MetricDefinition("**Índice de oportunidade (0 a 100)**", "indice_oportunidade", NUMBER_FORMAT.decimal, "Derivada"),
         MetricDefinition("**Posição no ranking (de 96 distritos)**", "posicao_ranking", NUMBER_FORMAT.integer, "Derivada"),
+        MetricDefinition("Índice de oportunidade, versão Pesquisa OD (0 a 100)", "indice_oportunidade_od", NUMBER_FORMAT.decimal, "Derivada"),
+        MetricDefinition("Posição no ranking, versão Pesquisa OD", "posicao_ranking_od", NUMBER_FORMAT.integer, "Derivada"),
     )
 )
 INFLUENCE_AREA_METRICS = MetricDefinitions(
@@ -77,6 +82,7 @@ INFLUENCE_AREA_METRICS = MetricDefinitions(
         MetricDefinition("População residente", "populacao_residente", NUMBER_FORMAT.integer, "Censo 2022"),
         MetricDefinition("Empregos formais", "vinculos_formais", NUMBER_FORMAT.integer, "RAIS 2025"),
         MetricDefinition("Mercado potencial café + lanches (R$/mês)", "mercado_potencial_mensal", NUMBER_FORMAT.rounded_currency, "Derivada"),
+        MetricDefinition("Mercado potencial café + lanches, fora de casa pela Pesquisa OD (R$/mês)", "mercado_potencial_mensal_od", NUMBER_FORMAT.rounded_currency, "Derivada"),
         MetricDefinition("Viagens diárias atraídas (exceto volta para casa)", "viagens_atraidas_nao_residenciais", NUMBER_FORMAT.integer, "Pesquisa OD 2023"),
         MetricDefinition("Viagens diárias atraídas por trabalho", "viagens_atraidas_trabalho", NUMBER_FORMAT.integer, "Pesquisa OD 2023"),
         MetricDefinition("Viagens entrevistadas na amostra", "viagens_atraidas_amostra", NUMBER_FORMAT.integer, "Pesquisa OD 2023"),
@@ -88,6 +94,7 @@ INFLUENCE_AREA_METRICS = MetricDefinitions(
         MetricDefinition("Cafeterias abertas em 24 meses", "cafeterias_abertas_24_meses", NUMBER_FORMAT.integer, "CNPJ"),
         MetricDefinition("Mercado por cafeteria (R$/mês)", "mercado_mensal_por_cafeteria", NUMBER_FORMAT.rounded_currency, "Derivada"),
         MetricDefinition("Mercado por ponto de venda (R$/mês)", "mercado_mensal_por_ponto_de_venda", NUMBER_FORMAT.rounded_currency, "Derivada"),
+        MetricDefinition("Mercado por ponto de venda, versão Pesquisa OD (R$/mês)", "mercado_mensal_por_ponto_de_venda_od", NUMBER_FORMAT.rounded_currency, "Derivada"),
     )
 )
 
@@ -116,6 +123,7 @@ class PilotReport:
             self._price_section(),
             self._influence_area_section(),
             self._ranking_section(),
+            RankingComparisonSection(self._database, self._directories, self._pilot_district_codes, self._texts.ranking_comparison_note()).render(),
             self._texts.methodology(),
             self._texts.limitations(),
             self._texts.next_steps(),
@@ -138,16 +146,22 @@ class PilotReport:
         metrics = self._directories.processed_file("distritos_metricas.parquet")
         index = self._directories.processed_file("distritos_indice_oportunidade.parquet")
         mobility = self._directories.marts_file("distritos_mobilidade.parquet")
+        ranking_comparison = self._directories.marts_file("distritos_comparacao_ranking.parquet")
         district_columns = ", ".join(
             f"max(valor) FILTER (WHERE codigo_distrito = '{code}') AS distrito_{position}"
             for position, code in enumerate(sorted(self._pilot_district_codes))
         )
         return f"""
             WITH completo AS (
-                SELECT metricas.*, indice.* EXCLUDE (codigo_distrito, nome_distrito), mobilidade.* EXCLUDE (codigo_distrito)
+                SELECT
+                    metricas.*,
+                    indice.* EXCLUDE (codigo_distrito, nome_distrito),
+                    mobilidade.* EXCLUDE (codigo_distrito),
+                    comparacao.* EXCLUDE (codigo_distrito, nome_distrito)
                 FROM '{metrics}' AS metricas
                 JOIN '{index}' AS indice USING (codigo_distrito)
                 JOIN '{mobility}' AS mobilidade USING (codigo_distrito)
+                JOIN '{ranking_comparison}' AS comparacao USING (codigo_distrito)
             ),
             longo AS (
                 UNPIVOT (SELECT codigo_distrito, COLUMNS(* EXCLUDE (codigo_distrito, nome_distrito))::DOUBLE FROM completo)
@@ -293,7 +307,7 @@ class PilotReport:
             ["Posição", "Distrito", "Índice", "Mercado por ponto de venda (R$/mês)", "Sobrevivência 3 anos", "Cafeterias ativas", "m² comercial (R$)"],
             rows,
         )
-        return "## 6. Ranking do índice de oportunidade (10 primeiros + distritos do piloto)\n\n" + table.render()
+        return "## 6. Ranking do índice de oportunidade, versão RAIS (10 primeiros + distritos do piloto)\n\n" + table.render()
 
     def _ranking_row(self, row: tuple[int, str, float, float, float, int, float]) -> list[str]:
         return [

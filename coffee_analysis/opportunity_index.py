@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from coffee_analysis.analytical_database import AnalyticalDatabase
-from coffee_analysis.data_directories import DataDirectories
 
 MARKET_WEIGHT = 0.40
 SURVIVAL_WEIGHT = 0.25
@@ -13,21 +12,18 @@ MINIMUM_PROPERTY_TRANSACTIONS = 5
 
 
 class OpportunityIndex:
-    def __init__(self, database: AnalyticalDatabase, directories: DataDirectories) -> None:
+    def __init__(self, database: AnalyticalDatabase, metrics: Path, destination: Path) -> None:
         self._database = database
-        self._directories = directories
+        self._metrics = metrics
+        self._destination = destination
 
     def build(self) -> Path:
-        return self._database.export_parquet(
-            self._index_query(),
-            self._directories.processed_file("distritos_indice_oportunidade.parquet"),
-        )
+        return self._database.export_parquet(self._index_query(), self._destination)
 
     def _percentile(self, column: str) -> str:
         return f"CASE WHEN {column} IS NOT NULL THEN percent_rank() OVER (PARTITION BY {column} IS NULL ORDER BY {column}) END"
 
     def _index_query(self) -> str:
-        metrics = self._directories.processed_file("distritos_metricas.parquet")
         return f"""
             WITH confiaveis AS (
                 SELECT
@@ -37,7 +33,7 @@ class OpportunityIndex:
                     crescimento_oferta_24_meses,
                     CASE WHEN amostra_sobrevivencia_3_anos >= {MINIMUM_SURVIVAL_SAMPLE} THEN sobrevivencia_3_anos END AS sobrevivencia_3_anos,
                     CASE WHEN transacoes_comerciais >= {MINIMUM_PROPERTY_TRANSACTIONS} THEN preco_mediano_m2_comercial END AS preco_mediano_m2_comercial
-                FROM '{metrics}'
+                FROM '{self._metrics}'
             ),
             percentis AS (
                 SELECT
