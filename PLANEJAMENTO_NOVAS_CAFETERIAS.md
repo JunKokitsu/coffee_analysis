@@ -196,10 +196,10 @@ limpam uma fonte, como `cnpj_*`, `cepea_arabica`, `ipca_cafe_rmsp`, `setores_cen
   atrasar, a tarefa `baixar_cnpj` usa a última publicação disponível até a competência. Esse dia
   deve ser revisto depois de alguns meses de observação.
 - Implementação: Airflow 3.3.2 em Docker Compose (`docker compose up airflow`, interface em
-  `localhost:8080`). As tarefas chamam `scripts/baixar_fontes.sh <fonte>` e
+  `localhost:8080`). Todas as tarefas, incluindo o download, chamam
   `main.py <etapa> --competencia AAAA-MM`. As dependências entre etapas ficam em
-  `coffee_analysis/pipeline_graph.py`, que é lido pela DAG e testado no pytest. A execução manual
-  aceita o parâmetro `competencia`.
+  `coffee_analysis/pipeline/pipeline_graph.py`, que é lido pela DAG e testado no pytest. A execução
+  manual aceita o parâmetro `competencia`.
 - Uma tarefa de download e uma de staging por fonte, que rodam em paralelo entre fontes. As
   tarefas de marts dependem das tabelas de staging que usam, e o relatório vem por último.
 - As tarefas são idempotentes: reexecutar uma competência sobrescreve só a pasta daquela
@@ -313,12 +313,12 @@ suposição nas duas versões.
 ## 11. Execução autônoma (concluída em 29/09/2026)
 
 Levantamento de 29/09/2026. Hoje o pipeline roda de ponta a ponta, mas não sozinho. É preciso
-executar `scripts/baixar_fontes.sh` e `main.py` à mão, e há valores fixos que envelhecem a cada mês:
+executar `main.py` à mão, inclusive as etapas de download, e há valores fixos que envelhecem a cada mês:
 
 | Onde | Valor fixo | Efeito |
 |---|---|---|
-| `scripts/baixar_fontes.sh` | `MES_CNPJ=2026-09` como padrão | Continua baixando o CNPJ de setembro |
-| `scripts/baixar_fontes.sh` | RAIS `2025` e URL do ITBI com data (`27082026`) | Não pega versões novas |
+| `scripts/baixar_fontes.sh` (bash, então em uso) | `MES_CNPJ=2026-09` como padrão | Continua baixando o CNPJ de setembro — **resolvido em 29/09/2026** com a descoberta automática de versão nas etapas `baixar_<fonte>` em Python (seção 12) |
+| `scripts/baixar_fontes.sh` (bash, então em uso) | RAIS `2025` e URL do ITBI com data (`27082026`) | Não pega versões novas — **resolvido em 29/09/2026** (seção 12) |
 | `main.py` | `REFERENCE_DATE = date(2026, 9, 23)` | Aberturas, fechamentos e sobrevivência ficam presos a setembro |
 | `coffee_analysis/report_texts.py` | "Principais achados" escritos à mão | Tabelas atualizadas com achados desatualizados |
 
@@ -327,7 +327,7 @@ Ordem executada em 29/09/2026: migração para staging/marts → passos 1 a 4 �
 | Passo | Entrega | Situação |
 |---|---|---|
 | 0 | **Migração** de `data/processed/` para staging e marts. As classes que misturavam limpeza e regra de negócio (renda 2010, RAIS, ITBI e CNPJ) foram separadas em uma classe de staging e outra de mart. A camada bruta dos dados mensais e anuais fica em pastas de competência (`cnpj/2026-09`, `rais/2025`, `itbi/2026-08-27`, `ipca/2026-09`) | **Feito** |
-| 1 | **Competência como parâmetro**: `main.py --competencia AAAA-MM [--data-referencia AAAA-MM-DD]`. A data de referência padrão é o menor valor entre hoje e o último dia da competência. `baixar_fontes.sh [fonte…]` descobre sozinho o último mês do CNPJ, o último ano da RAIS e o arquivo mais recente do ITBI | **Feito** |
+| 1 | **Competência como parâmetro**: `main.py --competencia AAAA-MM [--data-referencia AAAA-MM-DD]`. A data de referência padrão é o menor valor entre hoje e o último dia da competência. O `scripts/baixar_fontes.sh` de então descobria sozinho o último mês do CNPJ, o último ano da RAIS e o arquivo mais recente do ITBI; essa descoberta hoje está nas etapas `baixar_<fonte>` em Python (seção 12) | **Feito** |
 | 2 | **Qualidade de dados** (seção 9.4) | **Feito** |
 | 3 | **DAG do Airflow** (seção 9.3) | **Feito** |
 | 4 | **Achados automáticos** (`ReportFindings`): gerados dos marts a cada execução, com texto factual. A interpretação de negócio fica para quem revisa o relatório | **Feito** |
@@ -342,7 +342,7 @@ Grande em 1º.
 
 Pendente depois desta etapa:
 
-- migrar o download de `scripts/baixar_fontes.sh` para Python (seção 12), antes de integrar
+- migrar o download para Python (seção 12, **concluída em 29/09/2026**), antes de integrar
   fontes novas;
 - integrar as fontes da seção 10 que faltam (zoneamento do GeoSampa, alvarás, IPTU e Novo CAGED),
   já dentro da DAG e com o download em Python;
@@ -351,7 +351,7 @@ Pendente depois desta etapa:
 Fontes com publicação anual ou esporádica (Censo, POF, Pesquisa OD) continuam com verificação de
 versão nova. A troca de versão dessas fontes pode exigir ajuste manual no código.
 
-## 12. Download das fontes em Python (próxima etapa)
+## 12. Download das fontes em Python (concluída em 29/09/2026)
 
 Registrado em 29/09/2026.
 
@@ -389,11 +389,33 @@ para Python resolve quatro problemas:
 Segue a regra de novos desenvolvimentos: etapas pequenas executadas por modelos mais leves (Haiku
 ou Sonnet) e code review final por um modelo mais avançado.
 
-| Etapa | Entrega | Modelo sugerido |
+| Etapa | Entrega | Modelo sugerido | Situação |
+|---|---|---|---|
+| 1 | Classe base de download: requisição com repetição, gravação idempotente, download em partes com retomada | Sonnet | Feito |
+| 2 | Descoberta de versão do CNPJ, da RAIS e do ITBI, com testes sobre respostas gravadas | Sonnet | Feito |
+| 3 | Uma classe de download por fonte (CNPJ, IBGE, RAIS, ITBI, Pesquisa OD, Metrô, Motiva e GeoSampa) | Haiku ou Sonnet, uma fonte por tarefa | Feito |
+| 4 | Etapas `baixar_<fonte>` no `main.py` e no `pipeline_graph.py`. DAG chamando o `main.py` também para os downloads | Sonnet | Feito |
+| 5 | Execução completa da DAG com o download novo, remoção do `.sh` e atualização do README | Sonnet | **Feito em 29/09/2026** |
+| 6 | **Code review** de toda a migração | Modelo mais avançado (Opus) | **Feito em 30/09/2026** (ver 12.4) |
+
+### 12.4 Code review (30/09/2026)
+
+Problemas encontrados e corrigidos:
+
+| Ponto | Risco | Correção |
 |---|---|---|
-| 1 | Classe base de download: requisição com repetição, gravação idempotente, download em partes com retomada | Sonnet |
-| 2 | Descoberta de versão do CNPJ, da RAIS e do ITBI, com testes sobre respostas gravadas | Sonnet |
-| 3 | Uma classe de download por fonte (CNPJ, IBGE, RAIS, ITBI, Pesquisa OD, Metrô, Motiva e GeoSampa) | Haiku ou Sonnet, uma fonte por tarefa |
-| 4 | Etapas `baixar_<fonte>` no `main.py` e no `pipeline_graph.py`. DAG chamando o `main.py` também para os downloads | Sonnet |
-| 5 | Execução completa da DAG com o download novo, remoção do `.sh` e atualização do README | Sonnet |
-| 6 | **Code review** de toda a migração | Modelo mais avançado |
+| Download em partes gravava a resposta mesmo com status 200 | Um servidor que ignorasse o `Range` devolveria o arquivo inteiro para cada parte e corromperia o zip do CNPJ | A parte só é gravada com status 206. Teste de regressão com servidor que ignora `Range` |
+| Queda de conexão no meio de uma parte interrompia o download | O `.sh` tentava de novo, o Python abortava a tarefa | A queda conta como tentativa falha, o download retoma do ponto em que parou e espera 5 s entre tentativas |
+| A limpeza apagava a pasta `partes` inteira | Podia apagar partes de outro arquivo em retomada | Só as partes do próprio arquivo são apagadas, e a pasta só sai se ficar vazia. Teste de regressão |
+| Listagem FTP da RAIS sem timeout | A tarefa podia ficar travada indefinidamente | Timeout de 120 s |
+| Nome dos PDFs da Motiva decodificado (`unquote`) | Duplicava os 212 PDFs já baixados com o nome codificado pelo `.sh` (erro da especificação) | Nome mantido codificado, cópias idênticas removidas. Teste de regressão |
+| Laço aninhado no `MotivaDemandDownload.build` | Feria a regra de um nível de indentação | Reescrito com compreensão de lista |
+
+Validação real: download do `Empresas9.zip` de 2026-09 (94 MB, duas partes de 64 MB) direto da Receita,
+com resultado idêntico, byte a byte, ao arquivo existente. O servidor responde ao `HEAD` com
+`Content-Length` e ao `Range` com 206.
+
+Observações menores, sem correção: as URLs do IBGE, da Pesquisa OD e do GeoSampa ficam como texto
+dentro dos métodos, e não como constantes de módulo. O `PilotPipeline` cria os clientes HTTP e FTP
+mesmo quando só roda marts. Nenhuma das duas afeta o resultado.
+

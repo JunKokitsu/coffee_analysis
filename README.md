@@ -6,7 +6,6 @@ Pipeline descrito em `PLANEJAMENTO_NOVAS_CAFETERIAS.md`.
 
 ```bash
 uv sync
-COMPETENCIA=2026-09 ./scripts/baixar_fontes.sh
 uv run python main.py --competencia 2026-09
 uv run streamlit run dashboard_app.py
 ```
@@ -19,13 +18,15 @@ O relatório é gerado em `reports/piloto_novas_cafeterias.md`. Os dados seguem 
 
 Os resultados de qualidade ficam em `data/quality/`.
 
-- **Download:** `./scripts/baixar_fontes.sh [fonte ...]` baixa todas as fontes ou só as indicadas
-  (`cnpj`, `ibge`, `rais`, `itbi`, `pesquisa_od`, `metro`, `motiva`, `geosampa`). Ele descobre
-  sozinho a última publicação do CNPJ até a competência, o último ano da RAIS e o arquivo mais
-  recente do ITBI.
+- **Download:** `uv run python main.py baixar_<fonte> --competencia AAAA-MM`, uma etapa por fonte
+  (`baixar_cnpj`, `baixar_ibge`, `baixar_rais`, `baixar_itbi`, `baixar_pesquisa_od`, `baixar_metro`,
+  `baixar_motiva`, `baixar_geosampa`). Cada etapa descobre sozinha a versão mais recente até a
+  competência (último mês do CNPJ, último ano da RAIS, arquivo mais recente do ITBI) e não baixa de
+  novo se o arquivo já existe na pasta da competência.
 - **Etapas:** `uv run python main.py [etapa ...] --competencia AAAA-MM [--data-referencia AAAA-MM-DD]`.
-  Sem etapas, roda todas na ordem. A lista está em `uv run python main.py --help`, e as
-  dependências entre elas ficam em `coffee_analysis/pipeline_graph.py`.
+  Sem etapas, o `main.py` roda todas na ordem, dos downloads ao relatório. A lista está em
+  `uv run python main.py --help`, e as dependências entre elas ficam em
+  `coffee_analysis/pipeline/pipeline_graph.py`.
 - **Qualidade:** a etapa `qualidade` valida a staging e bloqueia os marts se alguma verificação falhar.
 - **Testes:** `uv run pytest`.
 
@@ -55,6 +56,5 @@ coffee_analysis/
 ├── reporting/        relatório em Markdown e achados automáticos
 └── dashboard/        dashboard em Streamlit
 dags/                 DAG mensal do Airflow
-scripts/              download das fontes
 tests/                testes unitários
 ```

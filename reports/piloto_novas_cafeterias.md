@@ -1,10 +1,10 @@
 # Piloto: métricas para abertura de cafeterias em São Paulo
 
-Data de referência: 29/09/2026. Recorte: distritos de **Pinheiros** (alta renda, polo de empregos) e **Itaquera** (Zona Leste, residencial e populoso), comparados com a mediana dos 96 distritos da capital.
+Data de referência: 30/09/2026. Recorte: distritos de **Pinheiros** (alta renda, polo de empregos) e **Itaquera** (Zona Leste, residencial e populoso), comparados com a mediana dos 96 distritos da capital.
 
 Todos os valores foram gerados pelo pipeline em `main.py` a partir das fontes públicas listadas na seção de metodologia. Os valores de mercado são **potenciais**, não previsão de faturamento.
 
-## Principais achados (gerados automaticamente em 29/09/2026)
+## Principais achados (gerados automaticamente em 30/09/2026)
 
 Os achados são montados a partir dos marts a cada execução. A interpretação de negócio fica para a revisão de quem lê.
 
@@ -66,7 +66,7 @@ Os achados são montados a partir dos marts a cada execução. A interpretação
 | Cafeterias abertas nos últimos 24 meses | 2 | 40 | 2 | CNPJ |
 | Cafeterias fechadas nos últimos 24 meses | 3 | 34 | 3 | CNPJ |
 | Saldo de cafeterias em 24 meses | -1 | 6 | 0 | CNPJ |
-| Novas cafeterias em 24 meses / cafeterias ativas | 10,0% | 31,0% | 24,2% | CNPJ |
+| Novas cafeterias em 24 meses / cafeterias ativas | 10,0% | 31,0% | 23,7% | CNPJ |
 
 ### Risco e custos
 
@@ -89,7 +89,7 @@ Os achados são montados a partir dos marts a cada execução. A interpretação
 | **Índice de oportunidade (0 a 100)** | 37,5 | 56,2 | 52,7 | Derivada |
 | **Posição no ranking (de 96 distritos)** | 75 | 36 | 48 | Derivada |
 | Índice de oportunidade, versão RAIS (0 a 100) | 36,2 | 57,9 | 53,5 | Derivada |
-| Posição no ranking, versão RAIS | 74 | 35 | 48 | Derivada |
+| Posição no ranking, versão RAIS | 75 | 35 | 48 | Derivada |
 
 ## 2. Sobrevivência dos negócios
 
@@ -97,27 +97,27 @@ Coortes de CNPJs abertos desde 2012. Um negócio conta como fechado quando está
 
 | Recorte | Categoria | Anos após abertura | Negócios na amostra | Ainda ativos |
 | --- | --- | --- | --- | --- |
-| Cidade de São Paulo | Cafeterias | 1 | 3.866 | 89,6% |
-| Cidade de São Paulo | Cafeterias | 2 | 3.588 | 77,5% |
+| Cidade de São Paulo | Cafeterias | 1 | 3.867 | 89,6% |
+| Cidade de São Paulo | Cafeterias | 2 | 3.589 | 77,5% |
 | Cidade de São Paulo | Cafeterias | 3 | 3.273 | 66,4% |
 | Cidade de São Paulo | Cafeterias | 5 | 2.675 | 51,2% |
-| Cidade de São Paulo | Cafeterias + lanchonetes | 1 | 61.096 | 86,2% |
-| Cidade de São Paulo | Cafeterias + lanchonetes | 2 | 55.981 | 77,6% |
-| Cidade de São Paulo | Cafeterias + lanchonetes | 3 | 51.130 | 65,6% |
-| Cidade de São Paulo | Cafeterias + lanchonetes | 5 | 41.861 | 49,0% |
+| Cidade de São Paulo | Cafeterias + lanchonetes | 1 | 61.117 | 86,2% |
+| Cidade de São Paulo | Cafeterias + lanchonetes | 2 | 56.004 | 77,6% |
+| Cidade de São Paulo | Cafeterias + lanchonetes | 3 | 51.136 | 65,6% |
+| Cidade de São Paulo | Cafeterias + lanchonetes | 5 | 41.888 | 49,0% |
 | Itaquera | Cafeterias | 1 | 24 | 83,3% |
 | Itaquera | Cafeterias | 2 | 22 | 68,2% |
 | Itaquera | Cafeterias | 3 | 18 | 50,0% |
 | Itaquera | Cafeterias | 5 | 14 | 42,9% |
 | Itaquera | Cafeterias + lanchonetes | 1 | 1.158 | 83,2% |
-| Itaquera | Cafeterias + lanchonetes | 2 | 1.053 | 74,4% |
+| Itaquera | Cafeterias + lanchonetes | 2 | 1.054 | 74,4% |
 | Itaquera | Cafeterias + lanchonetes | 3 | 952 | 61,4% |
 | Itaquera | Cafeterias + lanchonetes | 5 | 750 | 46,0% |
 | Pinheiros | Cafeterias | 1 | 215 | 94,0% |
 | Pinheiros | Cafeterias | 2 | 195 | 79,5% |
 | Pinheiros | Cafeterias | 3 | 179 | 71,5% |
 | Pinheiros | Cafeterias | 5 | 137 | 53,3% |
-| Pinheiros | Cafeterias + lanchonetes | 1 | 976 | 92,5% |
+| Pinheiros | Cafeterias + lanchonetes | 1 | 977 | 92,5% |
 | Pinheiros | Cafeterias + lanchonetes | 2 | 913 | 80,7% |
 | Pinheiros | Cafeterias + lanchonetes | 3 | 857 | 71,2% |
 | Pinheiros | Cafeterias + lanchonetes | 5 | 710 | 53,9% |
@@ -216,7 +216,7 @@ Cálculo por raio em torno do endereço. A população vem da área de cada seto
 | 3 | Butantã | 75,6 | R$ 5.933 | 70,0% | 24 | R$ 5.414 |
 | 4 | Morumbi | 74,7 | R$ 8.587 | 69,6% | 21 | R$ 11.522 |
 | 5 | Liberdade | 71,6 | R$ 3.776 | 74,6% | 51 | R$ 3.731 |
-| 6 | Vila Mariana | 70,1 | R$ 6.063 | 70,0% | 91 | R$ 10.523 |
+| 6 | Vila Mariana | 69,8 | R$ 6.063 | 70,0% | 91 | R$ 10.523 |
 | 7 | Campo Belo | 69,8 | R$ 5.234 | 69,8% | 38 | R$ 5.525 |
 | 8 | Moema | 69,3 | R$ 7.444 | 73,6% | 79 | R$ 15.385 |
 | 9 | Saúde | 68,3 | R$ 4.602 | 68,7% | 51 | R$ 5.808 |
@@ -244,7 +244,7 @@ Correlação entre as posições nas duas versões: **0,94**. Em média, um dist
 | Butantã | 5 | 3 | +2 | 73,5 | 75,6 | R$ 4.014 | R$ 5.933 |
 | Morumbi | 2 | 4 | -2 | 74,7 | 74,7 | R$ 6.871 | R$ 8.587 |
 | Liberdade | 13 | 5 | +8 | 67,4 | 71,6 | R$ 2.434 | R$ 3.776 |
-| Vila Mariana | 9 | 6 | +3 | 68,8 | 70,1 | R$ 4.284 | R$ 6.063 |
+| Vila Mariana | 9 | 6 | +3 | 68,6 | 69,8 | R$ 4.284 | R$ 6.063 |
 | Campo Belo | 6 | 7 | -1 | 71,0 | 69,8 | R$ 4.450 | R$ 5.234 |
 | Moema | 8 | 8 | +0 | 69,3 | 69,3 | R$ 5.507 | R$ 7.444 |
 | Saúde | 11 | 9 | +2 | 67,9 | 68,3 | R$ 3.777 | R$ 4.602 |
@@ -252,7 +252,7 @@ Correlação entre as posições nas duas versões: **0,94**. Em média, um dist
 | Cambuci | 10 | 21 | -11 | 68,3 | 64,1 | R$ 2.994 | R$ 3.647 |
 | Jaguaré | 1 | 27 | -26 | 76,8 | 61,2 | R$ 4.436 | R$ 3.344 |
 | Pinheiros | 35 | 36 | -1 | 57,9 | 56,2 | R$ 2.913 | R$ 3.772 |
-| Itaquera | 74 | 75 | -1 | 36,2 | 37,5 | R$ 1.258 | R$ 2.355 |
+| Itaquera | 75 | 75 | +0 | 36,2 | 37,5 | R$ 1.258 | R$ 2.355 |
 
 ### 5 maiores subidas e 5 maiores quedas com a Pesquisa OD
 

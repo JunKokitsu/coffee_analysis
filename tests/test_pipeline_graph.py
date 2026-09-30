@@ -1,4 +1,11 @@
-from coffee_analysis.pipeline.pipeline_graph import DOWNLOAD_SOURCES, MART_DEPENDENCIES, STEP_LAYERS, STAGING_LAYER, step_dependencies
+from coffee_analysis.pipeline.pipeline_graph import (
+    DOWNLOAD_LAYER,
+    MART_DEPENDENCIES,
+    STAGING_DOWNLOADS,
+    STAGING_LAYER,
+    STEP_LAYERS,
+    step_dependencies,
+)
 
 
 def test_every_dependency_is_a_known_step() -> None:
@@ -13,8 +20,22 @@ def test_steps_are_listed_after_their_dependencies() -> None:
     assert late_dependencies == []
 
 
-def test_downloads_only_feed_staging_steps() -> None:
-    assert all(STEP_LAYERS[step] == STAGING_LAYER for step in DOWNLOAD_SOURCES)
+def test_staging_downloads_only_point_to_download_steps() -> None:
+    assert all(STEP_LAYERS[download_step] == DOWNLOAD_LAYER for download_step in STAGING_DOWNLOADS.values())
+
+
+def test_staging_downloads_only_map_staging_steps() -> None:
+    assert all(STEP_LAYERS[step] == STAGING_LAYER for step in STAGING_DOWNLOADS)
+
+
+def test_staging_steps_with_download_depend_on_it() -> None:
+    for step, download_step in STAGING_DOWNLOADS.items():
+        assert step_dependencies(step) == (download_step,)
+
+
+def test_download_steps_have_no_dependencies() -> None:
+    download_steps = [step for step, layer in STEP_LAYERS.items() if layer == DOWNLOAD_LAYER]
+    assert all(step_dependencies(download_step) == () for download_step in download_steps)
 
 
 def test_quality_waits_for_every_staging_step() -> None:

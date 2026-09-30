@@ -2,7 +2,7 @@ FROM apache/airflow:3.3.2-python3.14
 
 USER root
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl unzip 7zip \
+    && apt-get install -y --no-install-recommends 7zip \
     && rm -rf /var/lib/apt/lists/*
 
 USER airflow

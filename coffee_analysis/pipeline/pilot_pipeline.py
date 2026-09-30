@@ -25,6 +25,7 @@ from coffee_analysis.marts.opportunity_index import OpportunityIndex
 from coffee_analysis.marts.origin_destination_market import OriginDestinationMarket
 from coffee_analysis.staging.mobility.origin_destination_survey import OriginDestinationSurvey
 from coffee_analysis.reporting.pilot_report import PilotReport
+from coffee_analysis.pipeline.download_steps import DownloadSteps
 from coffee_analysis.pipeline.pipeline_graph import STEP_LAYERS
 from coffee_analysis.staging.itbi.property_transactions import PropertyTransactions
 from coffee_analysis.staging.mobility.rail_stations import RailStations
@@ -44,7 +45,9 @@ class PilotPipeline:
         reference_date: date,
     ) -> None:
         database = AnalyticalDatabase()
+        download_steps = DownloadSteps(directories).build()
         self._steps: dict[str, Callable[[], Path]] = {
+            **download_steps,
             "enderecos": AddressDirectory(database, directories).build,
             "censo": CensusDistricts(directories).build,
             "renda_2010": CensusSectorIncome(database, directories).build,
@@ -82,6 +85,9 @@ class PilotPipeline:
             "area_influencia": InfluenceArea(database, directories, candidates, reference_date).build,
             "relatorio": PilotReport(database, directories, pilot_district_codes, reference_date).build,
         }
+
+    def step_names(self) -> list[str]:
+        return list(self._steps)
 
     def run(self, selected_steps: list[str]) -> list[Path]:
         step_names = selected_steps or list(STEP_LAYERS)
