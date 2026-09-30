@@ -2,12 +2,12 @@ import argparse
 from datetime import date
 from pathlib import Path
 
-from coffee_analysis.candidate_address import CandidateAddress
-from coffee_analysis.candidate_addresses import CandidateAddresses
-from coffee_analysis.competence import Competence
-from coffee_analysis.data_directories import DataDirectories
-from coffee_analysis.pilot_pipeline import PilotPipeline
-from coffee_analysis.pipeline_graph import STEP_LAYERS
+from coffee_analysis.marts.candidate_address import CandidateAddress
+from coffee_analysis.marts.candidate_addresses import CandidateAddresses
+from coffee_analysis.infrastructure.competence import Competence
+from coffee_analysis.infrastructure.data_directories import DataDirectories
+from coffee_analysis.pipeline.pilot_pipeline import PilotPipeline
+from coffee_analysis.pipeline.pipeline_graph import STEP_LAYERS
 
 PILOT_DISTRICT_CODES = ("355030862", "355030837")
 PILOT_CANDIDATES = CandidateAddresses(

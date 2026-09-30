@@ -137,11 +137,11 @@ Coortes de CNPJs abertos desde 2012. Um negócio conta como fechado quando está
 
 | Indicador | Variação em 12 meses | Variação desde jan/2018 |
 | --- | --- | --- |
+| Café arábica CEPEA/ESALQ (saca de 60 kg) | -29,1% | n/d |
 | IPCA RMSP - Cafezinho (até 202608) | +7,0% | +125,9% |
-| IPCA RMSP - Índice geral (até 202608) | +4,5% | +57,4% |
 | IPCA RMSP - Café moído (até 202608) | -18,7% | +138,4% |
 | IPCA RMSP - Lanche (até 202608) | +7,0% | +101,8% |
-| Café arábica CEPEA/ESALQ (saca de 60 kg) | -29,1% | n/d |
+| IPCA RMSP - Índice geral (até 202608) | +4,5% | +57,4% |
 
 | Data | Arábica CEPEA/ESALQ (R$/saca de 60 kg) |
 | --- | --- |

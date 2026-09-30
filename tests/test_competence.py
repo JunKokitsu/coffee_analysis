@@ -1,6 +1,6 @@
 from datetime import date
 
-from coffee_analysis.competence import Competence
+from coffee_analysis.infrastructure.competence import Competence
 
 
 def test_competence_of_day_uses_year_and_month() -> None:

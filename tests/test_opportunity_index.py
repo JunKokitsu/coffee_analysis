@@ -2,8 +2,8 @@ from pathlib import Path
 
 import polars
 
-from coffee_analysis.analytical_database import AnalyticalDatabase
-from coffee_analysis.opportunity_index import OpportunityIndex
+from coffee_analysis.infrastructure.analytical_database import AnalyticalDatabase
+from coffee_analysis.marts.opportunity_index import OpportunityIndex
 
 
 def test_best_district_combines_market_survival_and_low_cost(tmp_path: Path) -> None:

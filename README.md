@@ -42,3 +42,19 @@ docker compose up -d airflow dashboard
 - Para reprocessar uma competência, dispare a DAG manualmente com o parâmetro `competencia`.
 
 Os endereços analisados e os distritos do piloto são configurados em `main.py`.
+
+## Organização do código
+
+```
+coffee_analysis/
+├── infrastructure/   banco analítico (DuckDB), diretórios de dados e competência
+├── pipeline/         etapas do pipeline e grafo de dependências (lido pela DAG)
+├── staging/<fonte>/  limpeza e padronização de uma única fonte (cnpj, ibge, rais, itbi, cepea, mobility)
+├── quality/          validação da staging, que bloqueia os marts em caso de falha
+├── marts/            tabelas que cruzam fontes: métricas, índice, sobrevivência, áreas de influência
+├── reporting/        relatório em Markdown e achados automáticos
+└── dashboard/        dashboard em Streamlit
+dags/                 DAG mensal do Airflow
+scripts/              download das fontes
+tests/                testes unitários
+```

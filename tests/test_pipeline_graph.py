@@ -1,4 +1,4 @@
-from coffee_analysis.pipeline_graph import DOWNLOAD_SOURCES, MART_DEPENDENCIES, STEP_LAYERS, STAGING_LAYER, step_dependencies
+from coffee_analysis.pipeline.pipeline_graph import DOWNLOAD_SOURCES, MART_DEPENDENCIES, STEP_LAYERS, STAGING_LAYER, step_dependencies
 
 
 def test_every_dependency_is_a_known_step() -> None:

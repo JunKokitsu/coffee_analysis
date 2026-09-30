@@ -209,6 +209,20 @@ limpam uma fonte, como `cnpj_*`, `cepea_arabica`, `ipca_cafe_rmsp`, `setores_cen
 - O Airflow roda localmente (Docker Compose ou `airflow standalone`) e chama as mesmas classes
   do pacote `coffee_analysis`. A lógica não fica nas DAGs.
 
+### 9.3.1 Organização do código (29/09/2026)
+
+O pacote `coffee_analysis/` era plano, com 54 módulos. Agora os diretórios espelham as camadas:
+
+- `infrastructure/`: banco analítico, diretórios de dados e competência;
+- `pipeline/`: etapas do pipeline e `pipeline_graph`;
+- `staging/<fonte>/`: `cnpj`, `ibge`, `rais`, `itbi`, `cepea` e `mobility`;
+- `quality/`, `marts/`, `reporting/` e `dashboard/`.
+
+Duas classes foram renomeadas para refletir o que fazem depois da separação entre staging e marts:
+
+- `CoffeeShopRegistry` → `CoffeeShopClassification`;
+- `RaisWorkforce` → `FormalEmployment`.
+
 ### 9.4 Qualidade de dados (implementada em 29/09/2026)
 
 - **Testes unitários** (`uv run pytest`, pasta `tests/`): formatação, grafo de etapas, competência,
@@ -328,9 +342,58 @@ Grande em 1º.
 
 Pendente depois desta etapa:
 
+- migrar o download de `scripts/baixar_fontes.sh` para Python (seção 12), antes de integrar
+  fontes novas;
 - integrar as fontes da seção 10 que faltam (zoneamento do GeoSampa, alvarás, IPTU e Novo CAGED),
-  já dentro da DAG;
+  já dentro da DAG e com o download em Python;
 - observar as primeiras execuções mensais e calibrar o dia do agendamento e as tolerâncias de volume.
 
 Fontes com publicação anual ou esporádica (Censo, POF, Pesquisa OD) continuam com verificação de
 versão nova. A troca de versão dessas fontes pode exigir ajuste manual no código.
+
+## 12. Download das fontes em Python (próxima etapa)
+
+Registrado em 29/09/2026.
+
+### 12.1 Motivo
+
+O `scripts/baixar_fontes.sh` veio do piloto e não é uma necessidade técnica. Migrar o download
+para Python resolve quatro problemas:
+
+- **Dois padrões de download.** IPCA, POF e CEPEA já são baixados em Python, pelas classes
+  `SidraTable` e `ArabicaPrices`. As demais fontes passam pelo bash.
+- **Parte mais frágil sem teste.** A descoberta de versão (último mês do CNPJ, último ano da RAIS e
+  arquivo mais recente do ITBI) depende de listagens e HTML de terceiros e não tem teste. Em Python
+  entra no pytest.
+- **Fora das regras de código.** O bash não segue as regras do projeto: classes, tipagem e nomes
+  descritivos.
+- **Dois pontos de entrada.** Com a migração, o download vira etapa do `main.py` e a DAG passa a
+  chamar um único comando.
+
+### 12.2 Desenho
+
+| Item | Decisão |
+|---|---|
+| Ponto de entrada | Etapas `baixar_<fonte>` no `main.py` (`main.py baixar_cnpj --competencia 2026-09`). O grafo de `pipeline_graph.py` ganha a camada de download no lugar de `DOWNLOAD_SOURCES` |
+| CNPJ | `requests` com cabeçalho `Range` e partes de 64 MB, mantendo a retomada. Listagem dos meses com `PROPFIND` pelo `requests` |
+| RAIS | Listagem dos anos com `ftplib`. Descompactação dos `.7z` pelo binário `7z`/`7zz` via `subprocess`, porque o `py7zr` é lento para cerca de 9 GB |
+| ITBI | Página da Prefeitura lida com `requests`. A publicação mais recente é escolhida pela data no nome do arquivo |
+| Demais fontes | IBGE, Pesquisa OD, Metrô, Motiva e GeoSampa com `requests`. Descompactação com `zipfile` |
+| Idempotência | Não baixar de novo se o arquivo já existe na pasta da competência, como hoje |
+| Testes | Descoberta de versão testada com respostas gravadas (XML do `PROPFIND`, listagem do FTP, HTML do ITBI e do Metrô), sem acesso à rede |
+| Remoção | Apagar `scripts/baixar_fontes.sh` só depois de uma execução completa da DAG com o download novo |
+| Localização | Classes de download em `coffee_analysis/staging/<fonte>/`, junto das classes de staging da mesma fonte |
+
+### 12.3 Etapas de execução
+
+Segue a regra de novos desenvolvimentos: etapas pequenas executadas por modelos mais leves (Haiku
+ou Sonnet) e code review final por um modelo mais avançado.
+
+| Etapa | Entrega | Modelo sugerido |
+|---|---|---|
+| 1 | Classe base de download: requisição com repetição, gravação idempotente, download em partes com retomada | Sonnet |
+| 2 | Descoberta de versão do CNPJ, da RAIS e do ITBI, com testes sobre respostas gravadas | Sonnet |
+| 3 | Uma classe de download por fonte (CNPJ, IBGE, RAIS, ITBI, Pesquisa OD, Metrô, Motiva e GeoSampa) | Haiku ou Sonnet, uma fonte por tarefa |
+| 4 | Etapas `baixar_<fonte>` no `main.py` e no `pipeline_graph.py`. DAG chamando o `main.py` também para os downloads | Sonnet |
+| 5 | Execução completa da DAG com o download novo, remoção do `.sh` e atualização do README | Sonnet |
+| 6 | **Code review** de toda a migração | Modelo mais avançado |

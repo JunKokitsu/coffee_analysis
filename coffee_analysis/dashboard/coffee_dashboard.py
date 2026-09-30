@@ -3,7 +3,7 @@ from datetime import datetime
 import polars
 import streamlit
 
-from coffee_analysis.brazilian_number_format import BrazilianNumberFormat
+from coffee_analysis.reporting.brazilian_number_format import BrazilianNumberFormat
 from coffee_analysis.dashboard.dashboard_charts import DashboardCharts
 from coffee_analysis.dashboard.dashboard_data import DashboardData
 from coffee_analysis.dashboard.index_version import IndexVersion

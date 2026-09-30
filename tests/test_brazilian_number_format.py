@@ -1,6 +1,6 @@
 import math
 
-from coffee_analysis.brazilian_number_format import BrazilianNumberFormat
+from coffee_analysis.reporting.brazilian_number_format import BrazilianNumberFormat
 
 NUMBER_FORMAT = BrazilianNumberFormat()
 

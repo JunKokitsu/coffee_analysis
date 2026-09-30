@@ -4,9 +4,9 @@ from pathlib import Path
 import geopandas
 import polars
 
-from coffee_analysis.analytical_database import AnalyticalDatabase
+from coffee_analysis.infrastructure.analytical_database import AnalyticalDatabase
 from coffee_analysis.dashboard.index_version import IndexVersion
-from coffee_analysis.data_directories import DataDirectories
+from coffee_analysis.infrastructure.data_directories import DataDirectories
 
 
 class DashboardData:

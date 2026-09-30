@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from airflow.providers.standard.operators.bash import BashOperator
 from airflow.sdk import DAG, Param
 
-from coffee_analysis.pipeline_graph import DOWNLOAD_SOURCES, STEP_LAYERS, step_dependencies
+from coffee_analysis.pipeline.pipeline_graph import DOWNLOAD_SOURCES, STEP_LAYERS, step_dependencies
 
 PROJECT_DIRECTORY = "/opt/coffee_analysis"
 COMPETENCE_TEMPLATE = "{{ params.competencia or (dag_run.logical_date or dag_run.run_after).strftime('%Y-%m') }}"
