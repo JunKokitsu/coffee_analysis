@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from coffee_analysis.infrastructure.data_directories import DataDirectories
-from coffee_analysis.staging.mobility.rail_stations_download import RailStationsDownload
+from ponto_do_cafe.infrastructure.data_directories import DataDirectories
+from ponto_do_cafe.staging.mobility.rail_stations_download import RailStationsDownload
 from tests.recording_download_client import RecordingDownloadClient
 
 

@@ -1,7 +1,7 @@
 from datetime import date
 from pathlib import Path
 
-from coffee_analysis.staging.itbi.property_transaction_releases import (
+from ponto_do_cafe.staging.itbi.property_transaction_releases import (
     ITBI_PAGE_ADDRESS,
     PropertyTransactionReleases,
 )

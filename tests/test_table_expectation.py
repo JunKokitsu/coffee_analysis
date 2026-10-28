@@ -2,8 +2,8 @@ from pathlib import Path
 
 import polars
 
-from coffee_analysis.infrastructure.analytical_database import AnalyticalDatabase
-from coffee_analysis.quality.table_expectation import TableExpectation
+from ponto_do_cafe.infrastructure.analytical_database import AnalyticalDatabase
+from ponto_do_cafe.quality.table_expectation import TableExpectation
 
 
 def count(database: AnalyticalDatabase, query: str) -> int:

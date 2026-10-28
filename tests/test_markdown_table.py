@@ -1,4 +1,4 @@
-from coffee_analysis.reporting.markdown_table import MarkdownTable
+from ponto_do_cafe.reporting.markdown_table import MarkdownTable
 
 
 def test_render_builds_header_separator_and_rows() -> None:

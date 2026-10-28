@@ -1,5 +1,5 @@
-from coffee_analysis.infrastructure.http_client import HttpClient
-from coffee_analysis.staging.mobility.metro_demand_releases import MetroDemandReleases
+from ponto_do_cafe.infrastructure.http_client import HttpClient
+from ponto_do_cafe.staging.mobility.metro_demand_releases import MetroDemandReleases
 
 
 class RecordingMetroReleases(MetroDemandReleases):

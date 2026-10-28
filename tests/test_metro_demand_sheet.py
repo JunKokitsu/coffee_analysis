@@ -1,8 +1,8 @@
 from datetime import date
 from pathlib import Path
 
-from coffee_analysis.staging.mobility.metro_demand_sheet import MetroDemandSheet
-from coffee_analysis.staging.mobility.station_demand_record import StationDemandRecord
+from ponto_do_cafe.staging.mobility.metro_demand_sheet import MetroDemandSheet
+from ponto_do_cafe.staging.mobility.station_demand_record import StationDemandRecord
 
 SHEET = """METRÔ DE SÃO PAULO;;;;;;;;;;;;;
 LINHA 1-AZUL;;;;;;;;;;;;;

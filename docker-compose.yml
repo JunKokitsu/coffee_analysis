@@ -2,14 +2,14 @@ services:
   airflow:
     build: airflow
     user: "${AIRFLOW_UID:-1000}:0"
-    command: bash -c "airflow db migrate && airflow pools set coffee_analysis 3 'Etapas do pipeline de cafeterias' && airflow standalone"
+    command: bash -c "airflow db migrate && airflow pools set ponto_do_cafe 3 'Etapas do pipeline de cafeterias' && airflow standalone"
     environment:
-      AIRFLOW__CORE__DAGS_FOLDER: /opt/coffee_analysis/dags
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/ponto_do_cafe/dags
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__DEFAULT_TIMEZONE: America/Sao_Paulo
-      PYTHONPATH: /opt/coffee_analysis
+      PYTHONPATH: /opt/ponto_do_cafe/src
     volumes:
-      - .:/opt/coffee_analysis
+      - .:/opt/ponto_do_cafe
       - airflow_home:/opt/airflow
       - uv_cache:/home/airflow/.cache/uv
       - project_environment:/home/airflow/.venvs
@@ -20,9 +20,9 @@ services:
     build: airflow
     user: "${AIRFLOW_UID:-1000}:0"
     entrypoint: []
-    command: bash -c "cd /opt/coffee_analysis && env -u VIRTUAL_ENV uv run --frozen streamlit run dashboard_app.py --server.headless true --server.port 8501 --server.address 0.0.0.0"
+    command: bash -c "cd /opt/ponto_do_cafe && env -u VIRTUAL_ENV uv run --frozen streamlit run dashboard_app.py --server.headless true --server.port 8501 --server.address 0.0.0.0"
     volumes:
-      - .:/opt/coffee_analysis
+      - .:/opt/ponto_do_cafe
       - uv_cache:/home/airflow/.cache/uv
       - project_environment:/home/airflow/.venvs
     ports:

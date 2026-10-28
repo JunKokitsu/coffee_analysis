@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from coffee_analysis.infrastructure.data_directories import DataDirectories
-from coffee_analysis.staging.ibge.ibge_download import IbgeDownload
+from ponto_do_cafe.infrastructure.data_directories import DataDirectories
+from ponto_do_cafe.staging.ibge.ibge_download import IbgeDownload
 from tests.recording_archive_extractor import RecordingArchiveExtractor
 from tests.recording_download_client import RecordingDownloadClient
 

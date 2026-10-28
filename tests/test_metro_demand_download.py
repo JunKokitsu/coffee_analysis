@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from coffee_analysis.infrastructure.data_directories import DataDirectories
-from coffee_analysis.staging.mobility.metro_demand_download import MetroDemandDownload
+from ponto_do_cafe.infrastructure.data_directories import DataDirectories
+from ponto_do_cafe.staging.mobility.metro_demand_download import MetroDemandDownload
 from tests.recording_file_http_client import RecordingFileHttpClient
 from tests.recording_metro_releases import RecordingMetroReleases
 

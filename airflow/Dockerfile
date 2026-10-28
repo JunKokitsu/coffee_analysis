@@ -9,6 +9,6 @@ USER airflow
 RUN pip install --no-cache-dir uv \
     && mkdir -p /home/airflow/.venvs /home/airflow/.pythons /home/airflow/.cache/uv \
     && chmod -R g+rwX /home/airflow/.venvs /home/airflow/.pythons /home/airflow/.cache
-ENV UV_PROJECT_ENVIRONMENT=/home/airflow/.venvs/coffee_analysis \
+ENV UV_PROJECT_ENVIRONMENT=/home/airflow/.venvs/ponto_do_cafe \
     UV_PYTHON_INSTALL_DIR=/home/airflow/.pythons \
     UV_LINK_MODE=copy

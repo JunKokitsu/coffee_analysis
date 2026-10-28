@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from coffee_analysis.infrastructure.data_directories import DataDirectories
-from coffee_analysis.staging.rais.rais_download import RAIS_DIRECTORY, RAIS_HOST, RaisDownload
+from ponto_do_cafe.infrastructure.data_directories import DataDirectories
+from ponto_do_cafe.staging.rais.rais_download import RAIS_DIRECTORY, RAIS_HOST, RaisDownload
 from tests.fake_rais_ftp_client import FakeRaisFtpClient
 from tests.fake_seven_zip_extractor import FakeSevenZipExtractor
 from tests.fixed_rais_releases import FixedRaisReleases

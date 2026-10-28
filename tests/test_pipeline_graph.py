@@ -1,4 +1,4 @@
-from coffee_analysis.pipeline.pipeline_graph import (
+from ponto_do_cafe.pipeline.pipeline_graph import (
     DOWNLOAD_LAYER,
     MART_DEPENDENCIES,
     STAGING_DOWNLOADS,

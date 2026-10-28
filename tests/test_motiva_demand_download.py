@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from coffee_analysis.infrastructure.data_directories import DataDirectories
-from coffee_analysis.staging.mobility.motiva_demand_download import MotivaDemandDownload
+from ponto_do_cafe.infrastructure.data_directories import DataDirectories
+from ponto_do_cafe.staging.mobility.motiva_demand_download import MotivaDemandDownload
 from tests.recording_file_http_client import RecordingFileHttpClient
 from tests.encoded_name_motiva_releases import EncodedNameMotivaDemandReleases
 from tests.recording_motiva_releases import RecordingMotivaDemandReleases

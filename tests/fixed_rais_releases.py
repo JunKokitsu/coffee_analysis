@@ -1,4 +1,4 @@
-from coffee_analysis.staging.rais.rais_releases import RaisReleases
+from ponto_do_cafe.staging.rais.rais_releases import RaisReleases
 
 
 class FixedRaisReleases(RaisReleases):

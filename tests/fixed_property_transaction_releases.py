@@ -1,6 +1,6 @@
-from coffee_analysis.infrastructure.http_client import HttpClient
-from coffee_analysis.staging.itbi.property_transaction_release import PropertyTransactionRelease
-from coffee_analysis.staging.itbi.property_transaction_releases import PropertyTransactionReleases
+from ponto_do_cafe.infrastructure.http_client import HttpClient
+from ponto_do_cafe.staging.itbi.property_transaction_release import PropertyTransactionRelease
+from ponto_do_cafe.staging.itbi.property_transaction_releases import PropertyTransactionReleases
 
 
 class FixedPropertyTransactionReleases(PropertyTransactionReleases):

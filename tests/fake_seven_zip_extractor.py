@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from coffee_analysis.infrastructure.archive_extractor import ArchiveExtractor
+from ponto_do_cafe.infrastructure.archive_extractor import ArchiveExtractor
 
 
 class FakeSevenZipExtractor(ArchiveExtractor):

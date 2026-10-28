@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from coffee_analysis.staging.mobility.metro_demand_releases import (
+from ponto_do_cafe.staging.mobility.metro_demand_releases import (
     DATASET_PAGE_URL,
     METRO_TRANSPARENCY_ADDRESS,
     MetroDemandReleases,

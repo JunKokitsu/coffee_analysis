@@ -3,13 +3,13 @@ from pathlib import Path
 
 import streamlit
 
-from coffee_analysis.infrastructure.analytical_database import AnalyticalDatabase
-from coffee_analysis.infrastructure.competence import Competence
-from coffee_analysis.dashboard.chart_palette import ChartPalette
-from coffee_analysis.dashboard.coffee_dashboard import CoffeeDashboard
-from coffee_analysis.dashboard.dashboard_charts import DashboardCharts
-from coffee_analysis.dashboard.dashboard_data import DashboardData
-from coffee_analysis.infrastructure.data_directories import DataDirectories
+from ponto_do_cafe.infrastructure.analytical_database import AnalyticalDatabase
+from ponto_do_cafe.infrastructure.competence import Competence
+from ponto_do_cafe.dashboard.chart_palette import ChartPalette
+from ponto_do_cafe.dashboard.coffee_dashboard import CoffeeDashboard
+from ponto_do_cafe.dashboard.dashboard_charts import DashboardCharts
+from ponto_do_cafe.dashboard.dashboard_data import DashboardData
+from ponto_do_cafe.infrastructure.data_directories import DataDirectories
 from main import PILOT_DISTRICT_CODES
 
 streamlit.set_page_config(page_title="Cafeterias em São Paulo", page_icon="☕", layout="wide")

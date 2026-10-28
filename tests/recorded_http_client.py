@@ -2,7 +2,7 @@ from pathlib import Path
 
 import requests
 
-from coffee_analysis.infrastructure.http_client import HttpClient
+from ponto_do_cafe.infrastructure.http_client import HttpClient
 
 FIXTURES_DIRECTORY = Path(__file__).parent / "fixtures"
 

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from coffee_analysis.staging.cnpj.company_registry_releases import (
+from ponto_do_cafe.staging.cnpj.company_registry_releases import (
     RECEITA_CNPJ_ADDRESS,
     CompanyRegistryReleases,
 )

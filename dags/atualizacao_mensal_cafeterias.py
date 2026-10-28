@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 from airflow.providers.standard.operators.bash import BashOperator
 from airflow.sdk import DAG, Param
 
-from coffee_analysis.pipeline.pipeline_graph import DOWNLOAD_LAYER, STEP_LAYERS, step_dependencies
+from ponto_do_cafe.pipeline.pipeline_graph import DOWNLOAD_LAYER, STEP_LAYERS, step_dependencies
 
-PROJECT_DIRECTORY = "/opt/coffee_analysis"
+PROJECT_DIRECTORY = "/opt/ponto_do_cafe"
 COMPETENCE_TEMPLATE = "{{ params.competencia or (dag_run.logical_date or dag_run.run_after).strftime('%Y-%m') }}"
 DOWNLOAD_RETRIES = 3
 DOWNLOAD_RETRY_DELAY = timedelta(minutes=30)
@@ -25,7 +25,7 @@ def pipeline_task(step: str) -> BashOperator:
     return BashOperator(
         task_id=step,
         bash_command=f"cd {PROJECT_DIRECTORY} && env -u VIRTUAL_ENV uv run --frozen python main.py {step} --competencia {COMPETENCE_TEMPLATE}",
-        pool="coffee_analysis",
+        pool="ponto_do_cafe",
         **retry_arguments(step),
     )
 
@@ -38,7 +38,7 @@ with DAG(
     catchup=False,
     max_active_runs=1,
     params={"competencia": Param("", type="string", description="Competência AAAA-MM; vazio usa o mês da execução")},
-    tags=["coffee_analysis"],
+    tags=["ponto_do_cafe"],
 ) as dag:
     steps = {step: pipeline_task(step) for step in STEP_LAYERS}
     for step, task in steps.items():

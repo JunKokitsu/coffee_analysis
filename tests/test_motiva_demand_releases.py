@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from coffee_analysis.staging.mobility.motiva_demand_releases import MOTIVA_ADDRESS, MotivaDemandReleases
+from ponto_do_cafe.staging.mobility.motiva_demand_releases import MOTIVA_ADDRESS, MotivaDemandReleases
 from tests.recorded_http_client import RecordedHttpClient
 
 FIXTURES_DIRECTORY = Path(__file__).parent / "fixtures"

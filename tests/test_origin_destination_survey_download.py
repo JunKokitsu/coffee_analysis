@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from coffee_analysis.infrastructure.data_directories import DataDirectories
-from coffee_analysis.staging.mobility.origin_destination_survey_download import OriginDestinationSurveyDownload
+from ponto_do_cafe.infrastructure.data_directories import DataDirectories
+from ponto_do_cafe.staging.mobility.origin_destination_survey_download import OriginDestinationSurveyDownload
 from tests.recording_archive_extractor import RecordingArchiveExtractor
 from tests.recording_download_client import RecordingDownloadClient
 

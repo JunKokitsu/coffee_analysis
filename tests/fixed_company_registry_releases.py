@@ -1,5 +1,5 @@
-from coffee_analysis.infrastructure.http_client import HttpClient
-from coffee_analysis.staging.cnpj.company_registry_releases import CompanyRegistryReleases
+from ponto_do_cafe.infrastructure.http_client import HttpClient
+from ponto_do_cafe.staging.cnpj.company_registry_releases import CompanyRegistryReleases
 
 
 class FixedCompanyRegistryReleases(CompanyRegistryReleases):

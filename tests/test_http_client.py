@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from coffee_analysis.infrastructure.http_client import HttpClient
+from ponto_do_cafe.infrastructure.http_client import HttpClient
 from tests.range_ignoring_handler import RangeIgnoringHandler
 from tests.range_request_handler import RangeRequestHandler
 

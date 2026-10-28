@@ -3,9 +3,9 @@ from pathlib import Path
 
 import pytest
 
-from coffee_analysis.infrastructure.data_directories import DataDirectories
-from coffee_analysis.staging.itbi.property_transaction_release import PropertyTransactionRelease
-from coffee_analysis.staging.itbi.property_transactions_download import PropertyTransactionsDownload
+from ponto_do_cafe.infrastructure.data_directories import DataDirectories
+from ponto_do_cafe.staging.itbi.property_transaction_release import PropertyTransactionRelease
+from ponto_do_cafe.staging.itbi.property_transactions_download import PropertyTransactionsDownload
 from tests.fake_download_http_client import FakeDownloadHttpClient
 from tests.fixed_property_transaction_releases import FixedPropertyTransactionReleases
 

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from coffee_analysis.infrastructure.data_directories import DataDirectories
+from ponto_do_cafe.infrastructure.data_directories import DataDirectories
 
 
 def test_raw_competence_picks_latest_folder_up_to_competence(tmp_path: Path) -> None:

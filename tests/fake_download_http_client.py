@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from coffee_analysis.infrastructure.http_client import HttpClient
+from ponto_do_cafe.infrastructure.http_client import HttpClient
 
 FAKE_FILE_CONTENT = b"conteudo de teste"
 

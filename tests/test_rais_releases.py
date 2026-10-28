@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from coffee_analysis.staging.rais.rais_releases import RaisReleases
+from ponto_do_cafe.staging.rais.rais_releases import RaisReleases
 
 FIXTURES_DIRECTORY = Path(__file__).parent / "fixtures"
 

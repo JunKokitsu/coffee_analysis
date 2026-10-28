@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from coffee_analysis.infrastructure.ftp_client import FtpClient
+from ponto_do_cafe.infrastructure.ftp_client import FtpClient
 
 FAKE_FILE_CONTENT = b"conteudo de teste"
 

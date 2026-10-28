@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from coffee_analysis.infrastructure.data_directories import DataDirectories
-from coffee_analysis.staging.cnpj.company_registry_download import PART_SIZE_BYTES, CompanyRegistryDownload
-from coffee_analysis.staging.cnpj.company_registry_releases import RECEITA_CNPJ_ADDRESS, RECEITA_CNPJ_TOKEN
+from ponto_do_cafe.infrastructure.data_directories import DataDirectories
+from ponto_do_cafe.staging.cnpj.company_registry_download import PART_SIZE_BYTES, CompanyRegistryDownload
+from ponto_do_cafe.staging.cnpj.company_registry_releases import RECEITA_CNPJ_ADDRESS, RECEITA_CNPJ_TOKEN
 from tests.fake_download_http_client import FakeDownloadHttpClient
 from tests.fixed_company_registry_releases import FixedCompanyRegistryReleases
 

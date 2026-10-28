@@ -1,6 +1,6 @@
-# Análise de mercado para novas cafeterias (São Paulo)
+# Ponto do Café: análise de mercado para novas cafeterias (São Paulo)
 
-Pipeline descrito em `PLANEJAMENTO_NOVAS_CAFETERIAS.md`.
+Pipeline descrito em [`docs/PLANEJAMENTO_NOVAS_CAFETERIAS.md`](docs/PLANEJAMENTO_NOVAS_CAFETERIAS.md).
 
 ## Como executar localmente
 
@@ -26,7 +26,7 @@ Os resultados de qualidade ficam em `data/quality/`.
 - **Etapas:** `uv run python main.py [etapa ...] --competencia AAAA-MM [--data-referencia AAAA-MM-DD]`.
   Sem etapas, o `main.py` roda todas na ordem, dos downloads ao relatório. A lista está em
   `uv run python main.py --help`, e as dependências entre elas ficam em
-  `coffee_analysis/pipeline/pipeline_graph.py`.
+  `src/ponto_do_cafe/pipeline/pipeline_graph.py`.
 - **Qualidade:** a etapa `qualidade` valida a staging e bloqueia os marts se alguma verificação falhar.
 - **Testes:** `uv run pytest`.
 
@@ -47,7 +47,7 @@ Os endereços analisados e os distritos do piloto são configurados em `main.py`
 ## Organização do código
 
 ```
-coffee_analysis/
+src/ponto_do_cafe/
 ├── infrastructure/   banco analítico (DuckDB), diretórios de dados e competência
 ├── pipeline/         etapas do pipeline e grafo de dependências (lido pela DAG)
 ├── staging/<fonte>/  limpeza e padronização de uma única fonte (cnpj, ibge, rais, itbi, cepea, mobility)
@@ -57,4 +57,5 @@ coffee_analysis/
 └── dashboard/        dashboard em Streamlit
 dags/                 DAG mensal do Airflow
 tests/                testes unitários
+docs/                 planejamento e análise das fontes de dados
 ```

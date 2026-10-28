@@ -3,9 +3,9 @@ from pathlib import Path
 import polars
 import pytest
 
-from coffee_analysis.infrastructure.analytical_database import AnalyticalDatabase
-from coffee_analysis.infrastructure.data_directories import DataDirectories
-from coffee_analysis.marts.origin_destination_market import OriginDestinationMarket
+from ponto_do_cafe.infrastructure.analytical_database import AnalyticalDatabase
+from ponto_do_cafe.infrastructure.data_directories import DataDirectories
+from ponto_do_cafe.marts.origin_destination_market import OriginDestinationMarket
 
 
 def test_away_from_home_spending_follows_attracted_trips(tmp_path: Path) -> None:

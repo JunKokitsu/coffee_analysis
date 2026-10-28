@@ -1,5 +1,5 @@
-from coffee_analysis.infrastructure.http_client import HttpClient
-from coffee_analysis.staging.mobility.motiva_demand_releases import MotivaDemandReleases
+from ponto_do_cafe.infrastructure.http_client import HttpClient
+from ponto_do_cafe.staging.mobility.motiva_demand_releases import MotivaDemandReleases
 
 
 class RecordingMotivaDemandReleases(MotivaDemandReleases):

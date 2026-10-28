@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from coffee_analysis.infrastructure.ftp_client import FtpClient
+from ponto_do_cafe.infrastructure.ftp_client import FtpClient
 from tests.fake_ftp_connection import FAKE_FTP_FILE_CONTENT, FakeFtpConnection
 
 
